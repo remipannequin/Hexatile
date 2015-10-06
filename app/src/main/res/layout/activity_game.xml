@@ -1,0 +1,40 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:background="@android:color/white" tools:context=".GameActivity">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+
+    <gabygaby.hexatile.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="428dp"
+        android:keepScreenOn="true"
+        android:background="#fafafa"
+        android:paddingStart="8dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="40dp"
+        app:tileSize="33dp"
+        app:meshColor="#bdbdbd"
+        android:layout_gravity="center_horizontal|bottom" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="0"
+        android:id="@+id/scoreTextView"
+        android:layout_gravity="top|left"
+        android:enabled="true"
+        android:gravity="fill_vertical|right"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:textStyle="bold"
+        android:typeface="monospace"
+        android:textColor="@android:color/black"
+        android:textSize="40sp" />
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+
+</FrameLayout>
