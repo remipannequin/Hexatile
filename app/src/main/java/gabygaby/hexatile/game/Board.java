@@ -4,6 +4,7 @@ package gabygaby.hexatile.game;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Set;
 
@@ -21,6 +22,7 @@ public class Board extends Observable implements Parcelable {
     private final int width;
     private final int height;
     private int score;
+    private boolean dirty = false;
 
     public Board(int width, int height) {
         this.width = width;
@@ -31,7 +33,7 @@ public class Board extends Observable implements Parcelable {
         Tile new_tile;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                new_tile = new Tile(this);
+                new_tile = new Tile(this, j + i * width);
                 tiles[j + i * width] = new_tile;
             }
         }
@@ -82,9 +84,12 @@ public class Board extends Observable implements Parcelable {
     }
 
     /**
+     * compute a fusion around the last tile changed.
+     *
      * @param last Last tile modified
+     * @return the list of index of changed tiles
      */
-    public void compute(Tile last) {
+    public Set<Tile> compute(Tile last) {
         Set<Tile> group = last.findGroup();
         if (group.size() > THRESHOLD) {
             group.remove(last);
@@ -95,8 +100,11 @@ public class Board extends Observable implements Parcelable {
             score += Math.pow((last.getLevel() - 1 + group.size() - THRESHOLD), last.getLevel());
             setChanged();
             notifyObservers();
-            compute(last);
+            return group;
+        } else {
+            dirty = false;
         }
+        return group;
     }
 
     public int getScore() {
@@ -118,6 +126,11 @@ public class Board extends Observable implements Parcelable {
         }
         return true;
     }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
 
     @Override
     public int describeContents() {
@@ -153,5 +166,9 @@ public class Board extends Observable implements Parcelable {
 
     public Tile[] getTiles() {
         return tiles;
+    }
+
+    public void setDirty() {
+        dirty = true;
     }
 }

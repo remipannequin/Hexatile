@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
+ * Representation of an hexagonal tile on the board
+ *
  * Created by Rémi Pannequin on 25/09/15.
  */
 public class Tile {
@@ -12,10 +14,12 @@ public class Tile {
     private Tile right, left, up_left, up_right, down_left, down_right;
     private Board board;
     private int level;
+    private int index;
 
     public void fill() {
         if (isFree()) {
             level = 1;
+            board.setDirty();
         }
     }
 
@@ -23,12 +27,21 @@ public class Tile {
         this.level = level;
     }
 
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
 
     public enum Position {left, up_left, up_right, right, down_right, down_left};
 
-    public Tile(Board board) {
+    public Tile(Board board, int index) {
         this.board = board;
         this.level = 0;
+        this.index = index;
     }
 
     public Tile[] getNeighbours() {
@@ -67,6 +80,7 @@ public class Tile {
 
     public void promote() {
         this.level++;
+        board.setDirty();
     }
 
     public void consume() {
