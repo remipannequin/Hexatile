@@ -15,9 +15,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.CycleInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 import java.util.ArrayList;
@@ -37,9 +35,9 @@ public class BoardView extends ViewGroup {
 
     public static final float COS = 0.866025f;
     public static final float SIN = 0.5f;
-    private int meshColor = Color.RED; // TODO: use a default from R.color...
+    private int meshColor = Color.GRAY;
 
-    private int tileHeight, tileWidth = 0; // TODO: use a default from R.dimen...
+    private int tileHeight, tileWidth = 0;
     private Paint meshPaint;
 
     private Board board;
@@ -54,10 +52,12 @@ public class BoardView extends ViewGroup {
         init(null, 0);
     }
 
+
     public BoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(attrs, 0);
     }
+
 
     public BoardView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -88,9 +88,6 @@ public class BoardView extends ViewGroup {
         if (this.isInEditMode()) {
             setBoard(new Board(6, 8));
         }
-
-
-
     }
 
 
@@ -103,12 +100,10 @@ public class BoardView extends ViewGroup {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 result = true;
             }
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-            }
         }
         return result;
     }
+
 
     private void selectTile(float x, float y) {
         Tile selected = null;
@@ -125,12 +120,11 @@ public class BoardView extends ViewGroup {
 
                 while (board.isDirty()) {
                     Set<Tile> group = board.compute(selected);
-
                     //update group if required
                     if (group.size() >= Board.THRESHOLD) {
                         for (Tile t : group) {
                             int index = t.getIndex();
-                            final TileView view = (TileView)getChildAt(t.getIndex());
+                            final TileView view = (TileView) getChildAt(t.getIndex());
                             ObjectAnimator flipOutAnim = ObjectAnimator.ofFloat(view, "flip", -1, 0);
                             flipOutAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                                 @Override
@@ -138,19 +132,13 @@ public class BoardView extends ViewGroup {
                                     view.invalidate();
                                 }
                             });
-                        flipOutAnim.setDuration(250);
-                        flipOutAnim.setInterpolator(new DecelerateInterpolator());
-                        flipOutAnim.start();
-
-
-
+                            flipOutAnim.setDuration(250);
+                            flipOutAnim.setInterpolator(new DecelerateInterpolator());
+                            flipOutAnim.start();
                         }
-                        //update selected tile (promotion)
-                        //getChildAt(selected.getIndex()).invalidate();
-
                     } else {
                         //update selected tile (simple filling)
-                        final TileView view = (TileView)getChildAt(selected.getIndex());
+                        final TileView view = (TileView) getChildAt(selected.getIndex());
                         ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
                         flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
@@ -162,12 +150,9 @@ public class BoardView extends ViewGroup {
                         flipInAnim.setInterpolator(new AccelerateInterpolator());
                         flipInAnim.start();
                     }
-
                 }
             }
         }
-
-
     }
 
 
@@ -248,9 +233,8 @@ public class BoardView extends ViewGroup {
         }
         p3.transform(tr);
         mesh.add(p3);
-
-
     }
+
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -279,6 +263,7 @@ public class BoardView extends ViewGroup {
         return meshColor;
     }
 
+
     /**
      * Sets the view's example color attribute value. In the example view, this color
      * is the font color.
@@ -296,7 +281,6 @@ public class BoardView extends ViewGroup {
      * processing.
      */
     private class GestureListener extends GestureDetector.SimpleOnGestureListener {
-
 
         @Override
         public boolean onDown(MotionEvent e) {
