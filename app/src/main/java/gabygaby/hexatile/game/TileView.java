@@ -166,7 +166,7 @@ public class TileView extends View {
         if (tile != null) {
             drawing.reset();
             hexa.transform(scale_matrix, drawing);
-            canvas.drawPath(drawing, meshPaint);
+            //canvas.drawPath(drawing, meshPaint);
 
             int level = tile.getLevel();
             if (level > 0) {
