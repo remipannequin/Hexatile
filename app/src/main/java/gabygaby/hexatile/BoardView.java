@@ -16,7 +16,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.CycleInterpolator;
+import android.view.animation.DecelerateInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -137,7 +139,7 @@ public class BoardView extends ViewGroup {
                                 }
                             });
                         flipOutAnim.setDuration(250);
-                        flipOutAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                        flipOutAnim.setInterpolator(new DecelerateInterpolator());
                         flipOutAnim.start();
 
 
@@ -157,7 +159,7 @@ public class BoardView extends ViewGroup {
                             }
                         });
                         flipInAnim.setDuration(250);
-                        flipInAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                        flipInAnim.setInterpolator(new AccelerateInterpolator());
                         flipInAnim.start();
                     }
 
