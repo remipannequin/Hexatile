@@ -87,17 +87,17 @@ public class Board extends Observable implements Parcelable {
      * compute a fusion around the last tile changed.
      *
      * @param last Last tile modified
-     * @return the list of index of changed tiles
+     * @return the list of index of changed tiles (excluding last)
      */
     public Set<Tile> compute(Tile last) {
         Set<Tile> group = last.findGroup();
-        if (group.size() > THRESHOLD) {
-            group.remove(last);
+        group.remove(last);
+        if (group.size() >= THRESHOLD) {
             for (Tile t : group) {
                 t.consume();
             }
             last.promote();
-            score += Math.pow((last.getLevel() - 1 + group.size() - THRESHOLD), last.getLevel());
+            score += Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
             setChanged();
             notifyObservers();
             return group;

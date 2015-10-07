@@ -30,11 +30,11 @@ public class TileView extends View {
     private Path hexa;
     private Path[] levelPath;
     private Matrix rot_matrix;
-    private Paint meshPaint;
-    private int meshColor = Color.BLACK;
-    private Matrix translate_matrix;
     private Matrix scale_matrix;
-    private int alpha;
+    private boolean frozen;
+    private float flip;
+    private Matrix flip_matrix;
+    private int drawnLevel;
 
     public TileView(Context context) {
         super(context);
@@ -75,12 +75,6 @@ public class TileView extends View {
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         //textPaint.setColor();
         textPaint.setTextSize(10);
-
-
-        meshPaint = new Paint();
-        meshPaint.setStrokeWidth(4);
-        meshPaint.setStyle(Paint.Style.STROKE);
-        meshPaint.setColor(meshColor);
 
         // Update TextPaint and text measurements from attributes
         invalidateTextPaintAndMeasurements();
@@ -138,6 +132,7 @@ public class TileView extends View {
 
         scale_matrix = new Matrix();
         rot_matrix = new Matrix();
+        flip_matrix = new Matrix();
 
     }
 
@@ -152,7 +147,7 @@ public class TileView extends View {
         int width= MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
-        scale_matrix.postTranslate(width/2f, height/2f);
+        scale_matrix.postTranslate(width / 2f, height / 2f);
 
 
 
@@ -167,23 +162,28 @@ public class TileView extends View {
 
 
         if (tile != null) {
+            if (! frozen) {
+                drawnLevel = tile.getLevel();
+            }
             drawing.reset();
-            hexa.transform(scale_matrix, drawing);
+            hexa.transform(flip_matrix, drawing);
             //canvas.drawPath(drawing, meshPaint);
 
-            int level = tile.getLevel();
-            if (level > 0) {
-                canvas.drawPath(drawing, tilePaint[level]);
-                canvas.drawText(String.format("%d", level), 0, 0, textPaint);
+            if (drawnLevel > 0) {
+                drawing.transform(scale_matrix);
+                canvas.drawPath(drawing, tilePaint[drawnLevel]);
+                canvas.drawText(String.format("%d", drawnLevel), 0, 0, textPaint);
             }
 
-            if (level >= 2 && levelPath[level - 2] != null) {
+            if (drawnLevel >= 2 && levelPath[drawnLevel - 2] != null) {
                 drawing.reset();
                 rot_matrix.reset();
                 for (int k = 0; k < 6; k++) {
                     rot_matrix.setRotate(60 * k);
-                    levelPath[level - 2].transform(rot_matrix, drawing);
+                    levelPath[drawnLevel - 2].transform(rot_matrix, drawing);
+                    drawing.transform(flip_matrix);
                     drawing.transform(scale_matrix);
+
                     canvas.drawPath(drawing, decoPaint);//TODO: add decoPaint
                 }
             }
@@ -192,13 +192,28 @@ public class TileView extends View {
     }
 
     public void setAlpha(int value) {
-        this.alpha = value;
         for (Paint p : tilePaint) {
             p.setAlpha(value);
         }
 
 
     }
+
+    /**
+     * Achieve a "coin flipping" effect
+     * @param value from 1.0 to -1.0
+     */
+    public void setFlip(float value) {
+        flip_matrix.setScale(Math.abs(value), 1);
+        if (value < 0) {
+            //freeze drawnLevel from tile
+            frozen = true;
+        } else {
+            frozen = false;
+        }
+    }
+
+
 
 
     public void setTile(Tile tile) {

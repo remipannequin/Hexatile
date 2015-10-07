@@ -139,12 +139,22 @@ public class Tile {
         return (level == 0);
     }
 
+    /**
+     * Compute the group (i.e. connected tiles of same level) that this tile belongs to.
+     * @return the group (including the current tile)
+     */
     public Set<Tile> findGroup() {
-        return findGroup(new HashSet<Tile>());
+        Set<Tile> group = new HashSet<Tile>();
+        group.add(this);
+        return findGroup(group);
     }
 
-
-    public Set<Tile> findGroup(Set<Tile> group) {
+    /**
+     * Grow the group being constituted
+     * @param group the current group
+     * @return the group after growing
+     */
+    private Set<Tile> findGroup(Set<Tile> group) {
         for (Tile neighbour: getNeighbours()) {
             if (neighbour.getLevel() == level && !group.contains(neighbour)) {
                 group.add(neighbour);

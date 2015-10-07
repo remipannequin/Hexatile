@@ -15,6 +15,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.CycleInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,7 +75,7 @@ public class BoardView extends ViewGroup {
         centers = new HashMap<>();
         mesh = new ArrayList<>();
         meshPaint = new Paint();
-        meshPaint.setStrokeWidth(4);
+        meshPaint.setStrokeWidth(5);
         meshPaint.setStyle(Paint.Style.STROKE);
         meshPaint.setColor(meshColor);
 
@@ -123,26 +125,40 @@ public class BoardView extends ViewGroup {
                     Set<Tile> group = board.compute(selected);
 
                     //update group if required
-                    if (group.size() + 1 > Board.THRESHOLD) {
+                    if (group.size() >= Board.THRESHOLD) {
                         for (Tile t : group) {
                             int index = t.getIndex();
-                            getChildAt(index).invalidate();
+                            final TileView view = (TileView)getChildAt(t.getIndex());
+                            ObjectAnimator flipOutAnim = ObjectAnimator.ofFloat(view, "flip", -1, 0);
+                            flipOutAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                                @Override
+                                public void onAnimationUpdate(ValueAnimator animation) {
+                                    view.invalidate();
+                                }
+                            });
+                        flipOutAnim.setDuration(250);
+                        flipOutAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                        flipOutAnim.start();
+
+
+
                         }
                         //update selected tile (promotion)
-                        getChildAt(selected.getIndex()).invalidate();
+                        //getChildAt(selected.getIndex()).invalidate();
 
                     } else {
                         //update selected tile (simple filling)
                         final TileView view = (TileView)getChildAt(selected.getIndex());
-                        ObjectAnimator fadeInAnim = ObjectAnimator.ofInt(view, "alpha", 0, 255);
-                        fadeInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
+                        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
                             public void onAnimationUpdate(ValueAnimator animation) {
                                 view.invalidate();
                             }
                         });
-                        fadeInAnim.setDuration(500);
-                        fadeInAnim.start();
+                        flipInAnim.setDuration(250);
+                        flipInAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+                        flipInAnim.start();
                     }
 
                 }
