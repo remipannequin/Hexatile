@@ -34,6 +34,7 @@ public class TileView extends View {
     private int meshColor = Color.BLACK;
     private Matrix translate_matrix;
     private Matrix scale_matrix;
+    private int alpha;
 
     public TileView(Context context) {
         super(context);
@@ -163,6 +164,8 @@ public class TileView extends View {
 
 
 
+
+
         if (tile != null) {
             drawing.reset();
             hexa.transform(scale_matrix, drawing);
@@ -186,6 +189,15 @@ public class TileView extends View {
             }
 
         }
+    }
+
+    public void setAlpha(int value) {
+        this.alpha = value;
+        for (Paint p : tilePaint) {
+            p.setAlpha(value);
+        }
+
+
     }
 
 

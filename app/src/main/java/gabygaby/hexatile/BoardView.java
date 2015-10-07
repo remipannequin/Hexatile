@@ -1,5 +1,7 @@
 package gabygaby.hexatile;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -63,13 +65,9 @@ public class BoardView extends ViewGroup {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.BoardView, defStyle, 0);
-
-
         meshColor = a.getColor(
                 R.styleable.BoardView_meshColor,
                 meshColor);
-
-
         a.recycle();
         setWillNotDraw(false);
         centers = new HashMap<>();
@@ -77,6 +75,7 @@ public class BoardView extends ViewGroup {
         meshPaint = new Paint();
         meshPaint.setStrokeWidth(4);
         meshPaint.setStyle(Paint.Style.STROKE);
+        meshPaint.setColor(meshColor);
 
         gestureDetector = new GestureDetector(BoardView.this.getContext(), new GestureListener());
         gestureDetector.setIsLongpressEnabled(true);
@@ -85,6 +84,7 @@ public class BoardView extends ViewGroup {
         if (this.isInEditMode()) {
             setBoard(new Board(6, 8));
         }
+
 
 
     }
@@ -121,10 +121,28 @@ public class BoardView extends ViewGroup {
 
                 while (board.isDirty()) {
                     Set<Tile> group = board.compute(selected);
-                    group.add(selected);
-                    for (Tile t : group) {
-                        int index = t.getIndex();
-                        getChildAt(index).invalidate();
+
+                    //update group if required
+                    if (group.size() + 1 > Board.THRESHOLD) {
+                        for (Tile t : group) {
+                            int index = t.getIndex();
+                            getChildAt(index).invalidate();
+                        }
+                        //update selected tile (promotion)
+                        getChildAt(selected.getIndex()).invalidate();
+
+                    } else {
+                        //update selected tile (simple filling)
+                        final TileView view = (TileView)getChildAt(selected.getIndex());
+                        ObjectAnimator fadeInAnim = ObjectAnimator.ofInt(view, "alpha", 0, 255);
+                        fadeInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                            @Override
+                            public void onAnimationUpdate(ValueAnimator animation) {
+                                view.invalidate();
+                            }
+                        });
+                        fadeInAnim.setDuration(500);
+                        fadeInAnim.start();
                     }
 
                 }
@@ -231,8 +249,6 @@ public class BoardView extends ViewGroup {
             child.setTile(t);
             this.addView(child, i++);
         }
-
-
     }
 
 
@@ -253,15 +269,7 @@ public class BoardView extends ViewGroup {
      */
     public void setMeshColor(int color) {
         meshColor = color;
-    }
-
-    /**
-     * Gets the example dimension attribute value.
-     *
-     * @return The example dimension attribute value.
-     */
-    public float getTileSize() {
-        return tileHeight;
+        meshPaint.setColor(color);
     }
 
 
