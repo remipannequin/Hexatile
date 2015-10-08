@@ -37,7 +37,7 @@ public class GameActivity extends Activity {
         final TextView scoreView = (TextView)findViewById(R.id.scoreTextView);
 
         if (savedInstanceState == null) {
-            board = new Board(6, 8);
+            board = new Board(5, 6);
         } else {
             Parcelable savedBoard = savedInstanceState.getParcelable("board");
             board = (Board)savedBoard;
@@ -71,7 +71,13 @@ public class GameActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-
-
     }
+
+    public void newGame(View view) {
+        board.reset();
+        BoardView contentView = (BoardView) findViewById(R.id.fullscreen_content);
+        contentView.invalidateAll();
+        findViewById(R.id.scoreTextView).invalidate();
+    }
+
 }

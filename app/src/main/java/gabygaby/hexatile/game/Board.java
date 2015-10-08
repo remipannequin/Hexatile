@@ -127,6 +127,16 @@ public class Board extends Observable implements Parcelable {
         return true;
     }
 
+    /**
+     * Reset the game
+     */
+    public void reset() {
+        for (Tile t: tiles) {
+            t.consume();
+        }
+        score = 0;
+    }
+
     public boolean isDirty() {
         return dirty;
     }

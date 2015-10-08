@@ -39,12 +39,14 @@ public class BoardView extends ViewGroup {
 
     private int tileHeight, tileWidth = 0;
     private Paint meshPaint;
+    private boolean blockMoving;
 
     private Board board;
 
     private GestureDetector gestureDetector;
     private List<Path> mesh;
     private Map<PointF, Tile> centers;
+    private int additionalPadding;
 
 
     public BoardView(Context context) {
@@ -86,7 +88,7 @@ public class BoardView extends ViewGroup {
 
         // In edit mode it's nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
-            setBoard(new Board(6, 8));
+            setBoard(new Board(5, 6));
         }
     }
 
@@ -99,6 +101,12 @@ public class BoardView extends ViewGroup {
         if (!result) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 result = true;
+                blockMoving = false;
+            }
+            if (event.getAction() == MotionEvent.ACTION_MOVE && !blockMoving) {
+                float x = event.getX();
+                float y = event.getY();
+                selectTile(x,y);
             }
         }
         return result;
@@ -133,8 +141,9 @@ public class BoardView extends ViewGroup {
                                 }
                             });
                             flipOutAnim.setDuration(250);
-                            flipOutAnim.setInterpolator(new DecelerateInterpolator());
+                            flipOutAnim.setInterpolator(new DecelerateInterpolator(0.9f));
                             flipOutAnim.start();
+                            blockMoving = true;
                         }
                     } else {
                         //update selected tile (simple filling)
@@ -147,7 +156,7 @@ public class BoardView extends ViewGroup {
                             }
                         });
                         flipInAnim.setDuration(250);
-                        flipInAnim.setInterpolator(new AccelerateInterpolator());
+                        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
                         flipInAnim.start();
                     }
                 }
@@ -173,7 +182,7 @@ public class BoardView extends ViewGroup {
                 float tx = (j + offset / 2f) * tileWidth;
                 float ty = (i * 0.75f) * tileHeight;
 
-                v.layout(Math.round(tx + paddingLeft), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
+                v.layout(Math.round(tx + paddingLeft+additionalPadding), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
                 centers.put(new PointF(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2), v.getTile());
 
             }
@@ -186,17 +195,23 @@ public class BoardView extends ViewGroup {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
-        tileHeight = Math.round(Math.min(height / board.getHeight(), width / board.getWidth()));
-        tileWidth = Math.round(tileHeight * COS);
+        //case where the width is the limiting dimention
+        tileWidth = (int)Math.floor(width / (board.getWidth()+0.5f))-1;
+        additionalPadding = Math.round(((width) - (int)(tileWidth * (board.getWidth()+0.5)))*0.5f);
+        tileHeight = Math.round(tileWidth / COS);
+        setMeasuredDimension(width, (int)Math.round((board.getHeight() - (board.getHeight()-1)*0.25)*tileHeight));
+
         int child_height = MeasureSpec.makeMeasureSpec(tileHeight, MeasureSpec.EXACTLY);
         int child_width = MeasureSpec.makeMeasureSpec(tileWidth, MeasureSpec.EXACTLY);
+
+
 
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
             v.measure(child_width, child_height);
         }
         Matrix tr = new Matrix();
-        tr.setTranslate(getPaddingLeft(), getPaddingTop());
+        tr.setTranslate(getPaddingLeft()+additionalPadding/2, getPaddingTop());
         mesh.clear();
         for (float j = 0; j < board.getHeight() / 1.5; j += 1.5) {
             Path p1 = new Path();
@@ -275,6 +290,16 @@ public class BoardView extends ViewGroup {
         meshPaint.setColor(color);
     }
 
+    /**
+     * Invalidate the boardView and all the childern tileViews
+     */
+    public void invalidateAll() {
+        invalidate();
+        for (int i = 0; i < getChildCount(); i++) {
+            getChildAt(i).invalidate();
+        }
+    }
+
 
     /**
      * Extends {@link GestureDetector.SimpleOnGestureListener} to provide custom gesture
@@ -284,7 +309,6 @@ public class BoardView extends ViewGroup {
 
         @Override
         public boolean onDown(MotionEvent e) {
-            //TODO: turn on acceleration ?
             return true;
         }
 
@@ -293,6 +317,7 @@ public class BoardView extends ViewGroup {
             selectTile(e.getX(), e.getY());
             return false;
         }
+
     }
 
 

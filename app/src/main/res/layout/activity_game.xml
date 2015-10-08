@@ -1,45 +1,55 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:background="@android:color/white" tools:context=".GameActivity">
+    android:layout_height="fill_parent" android:background="@android:color/white" tools:context=".GameActivity"
+    android:orientation="vertical">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
          TextureView, etc. -->
 
-    <gabygaby.hexatile.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
-        android:id="@+id/fullscreen_content"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:keepScreenOn="true"
-        android:background="#fafafa"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="40dp"
-        app:tileSize="33dp"
-        app:meshColor="#bdbdbd"
-        android:layout_gravity="center_horizontal|bottom"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
-        android:layout_below="@+id/scoreTextView" />
-
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:text="0"
         android:id="@+id/scoreTextView"
-        android:layout_gravity="top|left"
         android:enabled="true"
-        android:gravity="fill_vertical|right"
-        android:layout_marginLeft="20dp"
+        android:gravity="fill_vertical|end"
         android:layout_marginRight="10dp"
         android:textStyle="bold"
         android:typeface="monospace"
         android:textColor="@android:color/black"
         android:textSize="40sp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp"
         android:layout_alignParentStart="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+         />
+
+    <gabygaby.hexatile.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
+        android:id="@+id/fullscreen_content"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:keepScreenOn="true"
+        android:background="#fafafa"
+        app:tileSize="33dp"
+        app:meshColor="#bdbdbd"
+        android:layout_gravity="center_horizontal|bottom"
+        android:layout_margin="10dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerInParent="true" />
+
+    <Button
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="New Game"
+        android:id="@+id/ResetButton"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"
+        android:enabled="true"
+        android:background="#00ffffff"
+        android:textColor="#000000"
+        android:onClick="newGame" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->
