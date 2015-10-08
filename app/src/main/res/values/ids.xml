@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+Google Play game services IDs.
+-->
+
+<resources>
+    <string name="app_id">81837955339</string>
+    <string name="package_name">gabygaby.hexatile</string>
+    <string name="leaderboard_classic">CgkIi7Kw77ACEAIQAQ</string>
+    <string name="achievement_first_tile">CgkIi7Kw77ACEAIQAg</string>
+    <string name="achievement_over_9000_">CgkIi7Kw77ACEAIQAw</string>
+    <string name="achievement_level_3_">CgkIi7Kw77ACEAIQBA</string>
+    <string name="achievement_level_5_">CgkIi7Kw77ACEAIQBQ</string>
+    <string name="achievement_million">CgkIi7Kw77ACEAIQBg</string>
+</resources>
