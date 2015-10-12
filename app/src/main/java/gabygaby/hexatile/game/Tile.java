@@ -24,7 +24,7 @@ public class Tile {
     }
 
     public void setLevel(int level) {
-        this.level = level;
+        this.level = Math.min(level, 6);
     }
 
     public int getIndex() {
@@ -79,7 +79,7 @@ public class Tile {
     }
 
     public void promote() {
-        this.level++;
+        setLevel(this.level + 1);
         board.setDirty();
     }
 

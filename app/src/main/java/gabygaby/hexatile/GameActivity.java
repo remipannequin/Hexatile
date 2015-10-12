@@ -1,29 +1,20 @@
 package gabygaby.hexatile;
 
-import gabygaby.hexatile.game.Board;
-import gabygaby.hexatile.util.SystemUiHider;
-
-import android.annotation.TargetApi;
+import android.app.ActionBar;
 import android.app.Activity;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
 import java.util.Observable;
 import java.util.Observer;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- *
- * @see SystemUiHider
- */
+import gabygaby.hexatile.game.Board;
+
 public class GameActivity extends Activity {
 
+    private static final String TAG = "Hexatile";
 
     private Board board;
 
@@ -32,7 +23,10 @@ public class GameActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_game);
-
+        ActionBar bar = getActionBar();
+        if (bar != null) {
+            bar.setDisplayHomeAsUpEnabled(true);
+        }
         final View contentView = findViewById(R.id.fullscreen_content);
         final TextView scoreView = (TextView)findViewById(R.id.scoreTextView);
 
@@ -52,8 +46,7 @@ public class GameActivity extends Activity {
                 scoreView.setText(String.format("%d", board.getScore()));
             }
         });
-
-
+        //TODO: also add Observer to update achievemnts
 
     }
 
@@ -71,6 +64,10 @@ public class GameActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+    }
+
+    public void gameOver() {
+        //TODO: show statistics in a dialog
     }
 
     public void newGame(View view) {

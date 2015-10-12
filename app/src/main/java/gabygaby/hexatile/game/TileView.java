@@ -22,8 +22,7 @@ import gabygaby.hexatile.R;
 public class TileView extends View {
 
     private Paint decoPaint;
-    private Paint[] tilePaint = new Paint[10];
-    private Paint textPaint;
+    private Paint[] tilePaint = new Paint[7];
     private int decoColor = Color.WHITE;
     private Tile tile;
     private Path drawing;
@@ -32,7 +31,6 @@ public class TileView extends View {
     private Matrix rot_matrix;
     private Matrix scale_matrix;
     private boolean frozen;
-    private float flip;
     private Matrix flip_matrix;
     private int drawnLevel;
 
@@ -60,21 +58,23 @@ public class TileView extends View {
         a.recycle();
 
 
+        if (this.isInEditMode()) {
+            Tile t = new Tile(null,0);
+            t.setLevel(6);
+            setTile(t);
+        }
+
         decoPaint = new Paint();
         decoPaint.setStrokeWidth(4);
         decoPaint.setStyle(Paint.Style.STROKE);
         decoPaint.setColor(decoColor);
 
         int[] levelColors = getContext().getResources().getIntArray(R.array.teal_theme);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 7; i++) {
             tilePaint[i] = new Paint();
             tilePaint[i].setStyle(Paint.Style.FILL);
             tilePaint[i].setColor(levelColors[i]);
         }
-
-        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        //textPaint.setColor();
-        textPaint.setTextSize(10);
 
         // Update TextPaint and text measurements from attributes
         invalidateTextPaintAndMeasurements();
@@ -95,7 +95,7 @@ public class TileView extends View {
         hexa.close();
         hexa.setFillType(Path.FillType.WINDING);
 
-        levelPath = new Path[8];
+        levelPath = new Path[6];
         levelPath[0] = new Path();
         levelPath[0].moveTo(0, 0.9f);
         levelPath[0].lineTo(0, 0.7f);
@@ -120,7 +120,7 @@ public class TileView extends View {
         levelPath[3].lineTo(0, 0.7f);
 
         levelPath[4] = new Path();
-        levelPath[4].moveTo(0.2f, 0.4f);
+        levelPath[4].moveTo(BoardView.COS/4f, 0.375f);
         levelPath[4].lineTo(0, 0.5f);
         levelPath[4].lineTo(0, 0.7f);
         levelPath[4].lineTo(0.1f, 0.7f);
@@ -128,7 +128,20 @@ public class TileView extends View {
         levelPath[4].lineTo(-0.1f, 0.7f);
         levelPath[4].lineTo(0, 0.7f);
         levelPath[4].lineTo(0, 0.5f);
-        levelPath[4].moveTo(-0.2f, 0.4f);
+        levelPath[4].lineTo(-BoardView.COS/4f, 0.375f);
+
+        levelPath[5] = new Path();
+        levelPath[5].moveTo(BoardView.COS/4f, 0.125f);
+        levelPath[5].lineTo(0, 0.5f);
+        levelPath[5].lineTo(0, 0.7f);
+        levelPath[5].lineTo(0.1f, 0.7f);
+        levelPath[5].lineTo(0, 0.9f);
+        levelPath[5].lineTo(-0.1f, 0.7f);
+        levelPath[5].lineTo(0, 0.7f);
+        levelPath[5].lineTo(0, 0.5f);
+        levelPath[5].lineTo(-BoardView.COS/4f, 0.125f);
+
+
 
         scale_matrix = new Matrix();
         rot_matrix = new Matrix();
@@ -157,10 +170,6 @@ public class TileView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-
-
-
-
         if (tile != null) {
             if (! frozen) {
                 drawnLevel = tile.getLevel();
@@ -172,7 +181,6 @@ public class TileView extends View {
             if (drawnLevel > 0) {
                 drawing.transform(scale_matrix);
                 canvas.drawPath(drawing, tilePaint[drawnLevel]);
-                canvas.drawText(String.format("%d", drawnLevel), 0, 0, textPaint);
             }
 
             if (drawnLevel >= 2 && levelPath[drawnLevel - 2] != null) {
@@ -195,8 +203,6 @@ public class TileView extends View {
         for (Paint p : tilePaint) {
             p.setAlpha(value);
         }
-
-
     }
 
     /**
@@ -205,15 +211,9 @@ public class TileView extends View {
      */
     public void setFlip(float value) {
         flip_matrix.setScale(Math.abs(value), 1);
-        if (value < 0) {
-            //freeze drawnLevel from tile
-            frozen = true;
-        } else {
-            frozen = false;
-        }
+        //freeze drawnLevel from tile
+        frozen = value < 0;
     }
-
-
 
 
     public void setTile(Tile tile) {

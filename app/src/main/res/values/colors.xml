@@ -16,14 +16,11 @@
 
     <array name="teal_theme">
         <item>@color/teal50</item>
-        <item>@color/teal100</item>
         <item>@color/teal200</item>
         <item>@color/teal300</item>
         <item>@color/teal400</item>
-        <item>@color/teal500</item>
         <item>@color/teal600</item>
         <item>@color/teal700</item>
-        <item>@color/teal800</item>
         <item>@color/teal900</item>
     </array>
 
