@@ -1,6 +1,5 @@
 package gabygaby.hexatile;
 
-import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
@@ -17,14 +16,15 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.Player;
 import com.google.android.gms.plus.Plus;
+import com.google.example.games.basegameutils.BaseGameUtils;
 
 import gabygaby.hexatile.game.Tile;
 import gabygaby.hexatile.game.TileView;
 
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-
+    private static int RC_SIGN_IN = 9001;
     private static final String TAG = "Hexatile";
 
     private GoogleApiClient mGoogleApiClient;
@@ -52,22 +52,25 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 .build();
 
         final TileView bestTile = (TileView) findViewById(R.id.bestTileView);
-        Tile t = new Tile(null,0);
+        Tile t = new Tile(null, 0);
         //TODO: get level from saved highscores
         t.setLevel(6);
         bestTile.setTile(t);
-        ObjectAnimator bestTileRotAnim = ObjectAnimator.ofFloat(bestTile, "flip", -1, 1);
+        ObjectAnimator bestTileRotAnim = ObjectAnimator.ofFloat(bestTile, "flip", 0, 1);
         bestTileRotAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 bestTile.invalidate();
             }
         });
-        bestTileRotAnim.setDuration(5000);
+        bestTileRotAnim.setDuration(3000);
         bestTileRotAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-        bestTileRotAnim.setRepeatMode(Animation.RESTART);
+        bestTileRotAnim.setRepeatMode(Animation.REVERSE);
         bestTileRotAnim.setRepeatCount(Animation.INFINITE);
         bestTileRotAnim.start();
+
+        findViewById(R.id.sign_in_button).setOnClickListener(this);
+        findViewById(R.id.sign_out_button).setOnClickListener(this);
 
 
     }
@@ -80,7 +83,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart(): connecting");
-        //mGoogleApiClient.connect();
+        mGoogleApiClient.connect();
     }
 
     @Override
@@ -133,21 +136,41 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
             mAutoStartSignInFlow = false;
             mSignInClicked = false;
             mResolvingConnectionFailure = true;
-                /*if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult,
+                if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult,
                         RC_SIGN_IN, getString(R.string.signin_other_error))) {
                     mResolvingConnectionFailure = false;
-                }*/
+                }
         }
 
         // Sign-in failed, so show sign-in button on main menu
 
     }
 
-
-    public void onSignInButtonClicked(View button) {
+    /**
+     * Called when clicking the singIn signOut buttons
+     *
+     * @param view
+     */
+    public void onClick(View view) {
         // start the sign-in flow
         mSignInClicked = true;
         mGoogleApiClient.connect();
+
+        if (view.getId() == R.id.sign_in_button) {
+            // start the asynchronous sign in flow
+            mSignInClicked = true;
+            mGoogleApiClient.connect();
+        } else if (view.getId() == R.id.sign_out_button) {
+            // sign out.
+            mSignInClicked = false;
+            Games.signOut(mGoogleApiClient);
+
+            // show sign-in button, hide the sign-out button
+            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+        }
+
+
     }
 
 
@@ -161,6 +184,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     /**
      * show game activity
+     *
      * @param v
      */
     public void onGameButtonClicked(View v) {
