@@ -11,6 +11,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import gabygaby.hexatile.game.Board;
+import gabygaby.hexatile.ui.BoardView;
 
 public class GameActivity extends Activity {
 
@@ -68,6 +69,10 @@ public class GameActivity extends Activity {
 
     public void gameOver() {
         //TODO: show statistics in a dialog
+
+
+
+
     }
 
     public void newGame(View view) {

@@ -24,7 +24,7 @@
         android:layout_alignParentEnd="true"
          />
 
-    <gabygaby.hexatile.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
+    <gabygaby.hexatile.ui.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
         android:id="@+id/fullscreen_content"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package gabygaby.hexatile.game;
+package gabygaby.hexatile.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -7,12 +7,11 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
-import gabygaby.hexatile.BoardView;
 import gabygaby.hexatile.R;
+import gabygaby.hexatile.game.Tile;
 
 /**
  * This view shows a single Tile

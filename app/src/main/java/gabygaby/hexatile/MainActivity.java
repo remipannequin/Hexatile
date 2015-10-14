@@ -19,7 +19,7 @@ import com.google.android.gms.plus.Plus;
 import com.google.example.games.basegameutils.BaseGameUtils;
 
 import gabygaby.hexatile.game.Tile;
-import gabygaby.hexatile.game.TileView;
+import gabygaby.hexatile.ui.TileView;
 
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {

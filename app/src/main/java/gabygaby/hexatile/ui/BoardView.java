@@ -1,4 +1,4 @@
-package gabygaby.hexatile;
+package gabygaby.hexatile.ui;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -24,9 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
-import gabygaby.hexatile.game.TileView;
 
 /**
  * The view shows a Board instance, and enable the user to play with it i.e. select tiles

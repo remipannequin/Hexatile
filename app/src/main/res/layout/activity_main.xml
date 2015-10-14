@@ -49,7 +49,7 @@
         android:onClick="onGameButtonClicked"
         android:text="New Game" />
 
-    <gabygaby.hexatile.game.TileView
+    <gabygaby.hexatile.ui.TileView
         android:id="@+id/bestTileView"
         android:layout_width="130dp"
         android:layout_height="150dp"
