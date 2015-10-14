@@ -31,7 +31,7 @@ import gabygaby.hexatile.game.Tile;
 /**
  * The view shows a Board instance, and enable the user to play with it i.e. select tiles
  */
-public class BoardView extends ViewGroup {
+public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     public static final float COS = 0.866025f;
     public static final float SIN = 0.5f;
@@ -124,42 +124,11 @@ public class BoardView extends ViewGroup {
         }
         if (selected != null) {
             if (selected.isFree()) {
-                selected.fill();
+                board.fill(selected);
+            } else {
+                //animate group
 
-                while (board.isDirty()) {
-                    Set<Tile> group = board.compute(selected);
-                    //update group if required
-                    if (group.size() >= Board.THRESHOLD) {
-                        for (Tile t : group) {
-                            int index = t.getIndex();
-                            final TileView view = (TileView) getChildAt(t.getIndex());
-                            ObjectAnimator flipOutAnim = ObjectAnimator.ofFloat(view, "flip", -1, 0);
-                            flipOutAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                                @Override
-                                public void onAnimationUpdate(ValueAnimator animation) {
-                                    view.invalidate();
-                                }
-                            });
-                            flipOutAnim.setDuration(250);
-                            flipOutAnim.setInterpolator(new DecelerateInterpolator(0.9f));
-                            flipOutAnim.start();
-                            blockMoving = true;
-                        }
-                    } else {
-                        //update selected tile (simple filling)
-                        final TileView view = (TileView) getChildAt(selected.getIndex());
-                        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
-                        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animation) {
-                                view.invalidate();
-                            }
-                        });
-                        flipInAnim.setDuration(250);
-                        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
-                        flipInAnim.start();
-                    }
-                }
+
             }
         }
     }
@@ -266,6 +235,7 @@ public class BoardView extends ViewGroup {
             child.setTile(t);
             this.addView(child, i++);
         }
+        board.addListener(this);
     }
 
 
@@ -298,6 +268,65 @@ public class BoardView extends ViewGroup {
         for (int i = 0; i < getChildCount(); i++) {
             getChildAt(i).invalidate();
         }
+    }
+
+    @Override
+    public void onTileAdded(Tile newTile) {
+        //update selected tile (simple filling)
+        final TileView view = (TileView) getChildAt(newTile.getIndex());
+        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
+        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.invalidate();
+            }
+        });
+        flipInAnim.setDuration(250);
+        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
+        flipInAnim.start();
+    }
+
+    @Override
+    public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
+        for (Tile t : group) {
+            int index = t.getIndex();
+            final TileView view = (TileView) getChildAt(t.getIndex());
+            ObjectAnimator flipOutAnim = ObjectAnimator.ofFloat(view, "flip", -1, 0);
+            flipOutAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    view.invalidate();
+                }
+            });
+            flipOutAnim.setDuration(250);
+            flipOutAnim.setInterpolator(new DecelerateInterpolator(0.9f));
+            flipOutAnim.start();
+            blockMoving = true;
+        }
+         final TileView view = (TileView) getChildAt(promoted.getIndex());
+        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
+        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.invalidate();
+            }
+        });
+        flipInAnim.setDuration(250);
+        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
+        flipInAnim.start();
+
+
+
+    }
+
+    @Override
+    public void onCascadeFinished() {
+
+    }
+
+    @Override
+    public void onGameOver() {
+
     }
 
 

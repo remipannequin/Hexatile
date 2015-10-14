@@ -11,9 +11,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import gabygaby.hexatile.game.Board;
+import gabygaby.hexatile.game.Tile;
 import gabygaby.hexatile.ui.BoardView;
 
-public class GameActivity extends Activity {
+public class GameActivity extends Activity implements Board.BoardEventListener {
 
     private static final String TAG = "Hexatile";
 
@@ -29,7 +30,7 @@ public class GameActivity extends Activity {
             bar.setDisplayHomeAsUpEnabled(true);
         }
         final View contentView = findViewById(R.id.fullscreen_content);
-        final TextView scoreView = (TextView)findViewById(R.id.scoreTextView);
+
 
         if (savedInstanceState == null) {
             board = new Board(5, 6);
@@ -39,16 +40,6 @@ public class GameActivity extends Activity {
         }
 
         ((BoardView)contentView).setBoard(board);
-
-        board.addObserver(new Observer() {
-            @Override
-            public void update(Observable observable, Object data) {
-                Board board = (Board) observable;
-                scoreView.setText(String.format("%d", board.getScore()));
-            }
-        });
-        //TODO: also add Observer to update achievemnts
-
     }
 
     @Override
@@ -70,9 +61,11 @@ public class GameActivity extends Activity {
     public void gameOver() {
         //TODO: show statistics in a dialog
 
+    }
 
-
-
+    public void updateScore() {
+        final TextView scoreView = (TextView)findViewById(R.id.scoreTextView);
+        scoreView.setText(String.format("%d", board.getScore()));
     }
 
     public void newGame(View view) {
@@ -82,4 +75,24 @@ public class GameActivity extends Activity {
         findViewById(R.id.scoreTextView).invalidate();
     }
 
+    @Override
+    public void onTileAdded(Tile newTile) {
+        //TODO Check achievements
+    }
+
+    @Override
+    public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
+        //Check achievements
+        updateScore();
+    }
+
+    @Override
+    public void onCascadeFinished() {
+        //TODO Check achievements
+    }
+
+    @Override
+    public void onGameOver() {
+        gameOver();
+    }
 }

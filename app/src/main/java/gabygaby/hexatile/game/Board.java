@@ -4,8 +4,8 @@ package gabygaby.hexatile.game;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
 import java.util.Set;
 
 /**
@@ -15,7 +15,7 @@ import java.util.Set;
  *
  * @author Rémi Pannequin
  */
-public class Board extends Observable implements Parcelable {
+public class Board implements Parcelable {
 
     public static final int THRESHOLD = 3;
     private final Tile[] tiles;
@@ -23,12 +23,16 @@ public class Board extends Observable implements Parcelable {
     private final int height;
     private int score;
     private boolean dirty = false;
+    private Stat stat;
+    private List<BoardEventListener> listeners;
 
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
+        stat = new Stat();
         score = 0;
         tiles = new Tile[height * width];
+        listeners = new ArrayList<>();
 
         Tile new_tile;
         for (int i = 0; i < height; i++) {
@@ -58,6 +62,23 @@ public class Board extends Observable implements Parcelable {
                 current.setDownRight(getTile(d, dr));
             }
         }
+    }
+
+    /**
+     * Add a listener, that will be called when the board change
+     *
+     * @param l
+     */
+    public void addListener(BoardEventListener l) {
+        listeners.add(l);
+    }
+
+    public void removeListener(BoardEventListener l) {
+        listeners.remove(l);
+    }
+
+    public void clearListeners() {
+        listeners.clear();
     }
 
     public Board(Parcel in) {
@@ -95,17 +116,20 @@ public class Board extends Observable implements Parcelable {
         if (group.size() >= THRESHOLD) {
             for (Tile t : group) {
                 t.consume();
+
             }
             last.promote();
-            score += Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
-            setChanged();
-            notifyObservers();
+            int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
+            stat.recordScore(last.getLevel(), reward);
+            score += reward;
+            dirty = true;
             return group;
         } else {
             dirty = false;
         }
         return group;
     }
+
 
     public int getScore() {
         return score;
@@ -131,7 +155,7 @@ public class Board extends Observable implements Parcelable {
      * Reset the game
      */
     public void reset() {
-        for (Tile t: tiles) {
+        for (Tile t : tiles) {
             t.consume();
         }
         score = 0;
@@ -178,7 +202,68 @@ public class Board extends Observable implements Parcelable {
         return tiles;
     }
 
-    public void setDirty() {
-        dirty = true;
+    /**
+     * Fill selected Tile, if it is empty, and enerate all cascading board events
+     *
+     * @param selected
+     */
+    public void fill(Tile selected) {
+        if (selected.isFree()) {
+            selected.fill();
+            dirty = true;
+            stat.recordPutTile(selected.getLevel());//level is always 1 here
+            for (BoardEventListener l : listeners) {
+                l.onTileAdded(selected);
+            }
+            while (isDirty()) {
+                Set<Tile> group = compute(selected);
+
+                if (group.size() >= Board.THRESHOLD) {
+                    for (BoardEventListener l : listeners) {
+                        l.onGroupCollapsed(group, selected);
+                    }
+                } else {
+                    for (BoardEventListener l : listeners) {
+                        l.onCascadeFinished();
+                    }
+                }
+            }
+            if (isGameOver()) {
+                for (BoardEventListener l : listeners) {
+                    l.onGameOver();
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Interface to be implemented by classes that wan't to be notified of game events
+     */
+    public interface BoardEventListener {
+        /**
+         * A new single tile is added to the board
+         *
+         * @param newTile the new tile
+         */
+        void onTileAdded(Tile newTile);
+
+        /**
+         * A  group collapse, creating a new tile
+         *
+         * @param group    the group of collapsed (reset to empty) tiles
+         * @param promoted the new level-up tile
+         */
+        void onGroupCollapsed(Iterable<Tile> group, Tile promoted);
+
+        /**
+         * Called when the board is stable, i.e. no more collapse events will happen
+         */
+        void onCascadeFinished();
+
+        /**
+         * Called when the game is over
+         */
+        void onGameOver();
     }
 }

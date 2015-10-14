@@ -19,12 +19,11 @@ public class Tile {
     public void fill() {
         if (isFree()) {
             level = 1;
-            board.setDirty();
         }
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(level, 6);
+        this.level = Math.min(level, 7);
     }
 
     public int getIndex() {
@@ -80,7 +79,6 @@ public class Tile {
 
     public void promote() {
         setLevel(this.level + 1);
-        board.setDirty();
     }
 
     public void consume() {
