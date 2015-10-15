@@ -1,5 +1,6 @@
 package gabygaby.hexatile.ui;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -16,7 +17,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.ViewAnimator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -288,19 +292,35 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
+        final TileView promotedView = (TileView) getChildAt(promoted.getIndex());
+        float targetX = promotedView.getLeft();
+        float targetY = promotedView.getTop();
         for (Tile t : group) {
             int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
-            ObjectAnimator flipOutAnim = ObjectAnimator.ofFloat(view, "flip", -1, 0);
-            flipOutAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            view.freeze();
+            float deltaX = targetX - view.getX();
+            float deltaY = targetY - view.getY();
+            TranslateAnimation a = new TranslateAnimation(0, deltaX, 0, deltaY);
+            a.initialize(view.getWidth(), view.getHeight(), getWidth(), getHeight());
+            a.setDuration(1000);
+            a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationUpdate(ValueAnimator animation) {
+                public void onAnimationStart(Animation animation) {
+                    view.freeze();
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    view.thaw();
                     view.invalidate();
                 }
+
+                @Override
+                public void onAnimationRepeat(Animation animation) {
+                }
             });
-            flipOutAnim.setDuration(250);
-            flipOutAnim.setInterpolator(new DecelerateInterpolator(0.9f));
-            flipOutAnim.start();
+            view.startAnimation(a);
             blockMoving = true;
         }
          final TileView view = (TileView) getChildAt(promoted.getIndex());

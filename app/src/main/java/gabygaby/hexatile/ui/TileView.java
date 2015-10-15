@@ -222,4 +222,12 @@ public class TileView extends View {
     public Tile getTile() {
         return tile;
     }
+
+    public void freeze() {
+        frozen = true;
+    }
+
+    public void thaw() {
+        frozen = false;
+    }
 }
