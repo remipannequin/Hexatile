@@ -87,6 +87,11 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     }
 
     @Override
+    public void onCascadeStarted() {
+        //TODO Check achievements
+    }
+
+    @Override
     public void onCascadeFinished() {
         //TODO Check achievements
     }

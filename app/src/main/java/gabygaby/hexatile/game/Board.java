@@ -215,6 +215,12 @@ public class Board implements Parcelable {
             for (BoardEventListener l : listeners) {
                 l.onTileAdded(selected);
             }
+            boolean collapsing = (selected.findGroup().size() >= Board.THRESHOLD);
+            if (collapsing) {
+                for (BoardEventListener l : listeners) {
+                    l.onCascadeStarted();
+                }
+            }
             while (isDirty()) {
                 Set<Tile> group = compute(selected);
 
@@ -223,8 +229,10 @@ public class Board implements Parcelable {
                         l.onGroupCollapsed(group, selected);
                     }
                 } else {
-                    for (BoardEventListener l : listeners) {
-                        l.onCascadeFinished();
+                    if (collapsing) {
+                        for (BoardEventListener l : listeners) {
+                            l.onCascadeFinished();
+                        }
                     }
                 }
             }
@@ -260,6 +268,13 @@ public class Board implements Parcelable {
          * Called when the board is stable, i.e. no more collapse events will happen
          */
         void onCascadeFinished();
+
+         /**
+         * Called when at least one collapse will happen
+         */
+        void onCascadeStarted();
+
+
 
         /**
          * Called when the game is over

@@ -1,6 +1,6 @@
 package gabygaby.hexatile.ui;
 
-import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -17,16 +17,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
-import android.widget.ViewAnimator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
@@ -41,16 +36,17 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     public static final float SIN = 0.5f;
     private int meshColor = Color.GRAY;
 
-    private int tileHeight, tileWidth = 0;
-    private Paint meshPaint;
-    private boolean blockMoving;
-
     private Board board;
 
     private GestureDetector gestureDetector;
     private List<Path> mesh;
     private Map<PointF, Tile> centers;
     private int additionalPadding;
+    private Paint meshPaint;
+    private boolean blockMoving;
+    private int tileHeight, tileWidth = 0;
+    private AnimatorSet collapseAnim;
+    private CollapseAnimator collapseAnimator;
 
 
     public BoardView(Context context) {
@@ -80,6 +76,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 meshColor);
         a.recycle();
         setWillNotDraw(false);
+
+        collapseAnimator = new CollapseAnimator();
         centers = new HashMap<>();
         mesh = new ArrayList<>();
         meshPaint = new Paint();
@@ -90,7 +88,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         gestureDetector = new GestureDetector(BoardView.this.getContext(), new GestureListener());
         gestureDetector.setIsLongpressEnabled(true);
 
-        // In edit mode it's nice to have some demo data, so add that here.
+        // In edit mode it'animatorSet nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             setBoard(new Board(5, 6));
         }
@@ -254,7 +252,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
 
     /**
-     * Sets the view's example color attribute value. In the example view, this color
+     * Sets the view'animatorSet example color attribute value. In the example view, this color
      * is the font color.
      *
      * @param color The example color attribute value to use.
@@ -291,57 +289,37 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     }
 
     @Override
+    public void onCascadeStarted() {
+        collapseAnimator.reset();
+    }
+
+    @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
+        //block hover selection
+        blockMoving = true;
+
         final TileView promotedView = (TileView) getChildAt(promoted.getIndex());
         float targetX = promotedView.getLeft();
         float targetY = promotedView.getTop();
+        collapseAnimator.setTarget(promotedView.getLeft(), promotedView.getTop());
+        collapseAnimator.newGroup();
+
         for (Tile t : group) {
             int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
+
             view.freeze();
-            float deltaX = targetX - view.getX();
-            float deltaY = targetY - view.getY();
-            TranslateAnimation a = new TranslateAnimation(0, deltaX, 0, deltaY);
-            a.initialize(view.getWidth(), view.getHeight(), getWidth(), getHeight());
-            a.setDuration(1000);
-            a.setAnimationListener(new Animation.AnimationListener() {
-                @Override
-                public void onAnimationStart(Animation animation) {
-                    view.freeze();
-                }
-
-                @Override
-                public void onAnimationEnd(Animation animation) {
-                    view.thaw();
-                    view.invalidate();
-                }
-
-                @Override
-                public void onAnimationRepeat(Animation animation) {
-                }
-            });
-            view.startAnimation(a);
-            blockMoving = true;
+            collapseAnimator.addTranslation(view);
         }
-         final TileView view = (TileView) getChildAt(promoted.getIndex());
-        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
-        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                view.invalidate();
-            }
-        });
-        flipInAnim.setDuration(250);
-        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
-        flipInAnim.start();
 
-
+        final TileView view = (TileView) getChildAt(promoted.getIndex());
+        collapseAnimator.addPromotion(view);
 
     }
 
     @Override
     public void onCascadeFinished() {
-
+        collapseAnimator.start();
     }
 
     @Override
