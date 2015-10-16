@@ -76,7 +76,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     }
 
     @Override
-    public void onTileAdded(Tile newTile) {
+    public void onTileAdded(Tile newTile, boolean collapsing) {
         //TODO Check achievements
     }
 
@@ -84,11 +84,6 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
         //Check achievements
         updateScore();
-    }
-
-    @Override
-    public void onCascadeStarted() {
-        //TODO Check achievements
     }
 
     @Override

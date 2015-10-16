@@ -212,14 +212,9 @@ public class Board implements Parcelable {
             selected.fill();
             dirty = true;
             stat.recordPutTile(selected.getLevel());//level is always 1 here
+            boolean collapsing = (selected.findGroup().size() > Board.THRESHOLD);
             for (BoardEventListener l : listeners) {
-                l.onTileAdded(selected);
-            }
-            boolean collapsing = (selected.findGroup().size() >= Board.THRESHOLD);
-            if (collapsing) {
-                for (BoardEventListener l : listeners) {
-                    l.onCascadeStarted();
-                }
+                l.onTileAdded(selected, collapsing);
             }
             while (isDirty()) {
                 Set<Tile> group = compute(selected);
@@ -253,8 +248,9 @@ public class Board implements Parcelable {
          * A new single tile is added to the board
          *
          * @param newTile the new tile
+         * @param collapsing if true, a collapse will follow
          */
-        void onTileAdded(Tile newTile);
+        void onTileAdded(Tile newTile, boolean collapsing);
 
         /**
          * A  group collapse, creating a new tile
@@ -268,13 +264,6 @@ public class Board implements Parcelable {
          * Called when the board is stable, i.e. no more collapse events will happen
          */
         void onCascadeFinished();
-
-         /**
-         * Called when at least one collapse will happen
-         */
-        void onCascadeStarted();
-
-
 
         /**
          * Called when the game is over

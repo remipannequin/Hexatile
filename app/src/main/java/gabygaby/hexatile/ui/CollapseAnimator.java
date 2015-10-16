@@ -16,7 +16,7 @@ public class CollapseAnimator {
     private AnimatorSet set;
     private int targetY;
     private int targetX;
-    private ObjectAnimator lastInGroup;
+    private Animator lastInGroup;
     /**
      * True if there was no group previously in the animation
      */
@@ -26,13 +26,28 @@ public class CollapseAnimator {
      */
     private boolean groupBegin;
 
+    /**
+     * Reset the animator set
+     */
     public void reset() {
         set = new AnimatorSet();
         firstGroup = true;
     }
 
     /**
+     * Reset the animator set with a starting animation
+     * @param a the animator to play first
+     */
+    public void reset(Animator a) {
+        set = new AnimatorSet();
+        firstGroup = false;
+        lastInGroup = a;
+    }
+
+
+    /**
      * Set the coordinates of the target tile (being promoted)
+     *
      * @param left
      * @param top
      */
@@ -53,6 +68,7 @@ public class CollapseAnimator {
 
     /**
      * Add a Translation animation into a group
+     *
      * @param view
      */
     public void addTranslation(final TileView view) {
@@ -68,12 +84,12 @@ public class CollapseAnimator {
         a1.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-                view.freeze();
+
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                view.thaw();
+                view.syncDrawnLevel();
                 view.invalidate();
                 view.setTranslationX(0);
                 view.setTranslationY(0);
@@ -103,21 +119,78 @@ public class CollapseAnimator {
 
     /**
      * add a promotion animation into the group
+     *
      * @param view
+     * @param new_level
      */
-    public void addPromotion(final TileView view) {
-        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
-        flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+    public void addPromotion(final TileView view, final int new_level) {
+
+        ObjectAnimator fadeout = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
+        fadeout.setDuration(100);
+        fadeout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 view.invalidate();
             }
         });
-        flipInAnim.setDuration(250);
-        flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
-        flipInAnim.start();
+        fadeout.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.incrDrawnLevel();
+                view.invalidate();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
 
 
+        ObjectAnimator fadein = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
+        fadein.setDuration(100);
+        fadein.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                view.invalidate();
+            }
+        });
+        fadein.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                view.invalidate();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
+
+
+        set.play(lastInGroup).before(fadeout);
+        set.play(fadeout).before(fadein);
+        lastInGroup = fadeout;
     }
 
     /**

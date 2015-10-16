@@ -1,5 +1,6 @@
 package gabygaby.hexatile.ui;
 
+import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
@@ -273,7 +274,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     }
 
     @Override
-    public void onTileAdded(Tile newTile) {
+    public void onTileAdded(Tile newTile, boolean collapsing) {
         //update selected tile (simple filling)
         final TileView view = (TileView) getChildAt(newTile.getIndex());
         ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
@@ -283,15 +284,36 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 view.invalidate();
             }
         });
+        flipInAnim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                view.incrDrawnLevel();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+
+            }
+        });
         flipInAnim.setDuration(250);
         flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
-        flipInAnim.start();
+        if (collapsing) {
+            collapseAnimator.reset(flipInAnim);
+        } else {
+            flipInAnim.start();
+        }
     }
 
-    @Override
-    public void onCascadeStarted() {
-        collapseAnimator.reset();
-    }
 
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
@@ -307,13 +329,11 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         for (Tile t : group) {
             int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
-
-            view.freeze();
             collapseAnimator.addTranslation(view);
         }
 
         final TileView view = (TileView) getChildAt(promoted.getIndex());
-        collapseAnimator.addPromotion(view);
+        collapseAnimator.addPromotion(view, promoted.getLevel());
 
     }
 

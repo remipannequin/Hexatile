@@ -170,9 +170,6 @@ public class TileView extends View {
         super.onDraw(canvas);
 
         if (tile != null) {
-            if (! frozen) {
-                drawnLevel = tile.getLevel();
-            }
             drawing.reset();
             hexa.transform(flip_matrix, drawing);
             //canvas.drawPath(drawing, meshPaint);
@@ -211,7 +208,7 @@ public class TileView extends View {
     public void setFlip(float value) {
         flip_matrix.setScale(Math.abs(value), 1);
         //freeze drawnLevel from tile
-        frozen = value < 0;
+        //frozen = value < 0;
     }
 
 
@@ -223,11 +220,14 @@ public class TileView extends View {
         return tile;
     }
 
-    public void freeze() {
-        frozen = true;
+    public void incrDrawnLevel() {
+        drawnLevel++;
     }
 
-    public void thaw() {
-        frozen = false;
+    public void syncDrawnLevel() {
+        if (tile != null) {
+            drawnLevel = tile.getLevel();
+        }
     }
+
 }
