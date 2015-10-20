@@ -52,7 +52,9 @@ public class TileView extends View {
         // Load attributes
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.BoardView, defStyle, 0);
-
+        decoColor = a.getColor(
+                R.styleable.TileView_decoColor,
+                decoColor);
 
         a.recycle();
 
@@ -139,12 +141,9 @@ public class TileView extends View {
         levelPath[5].lineTo(0, 0.5f);
         levelPath[5].lineTo(-BoardView.COS/4f, 0.125f);
 
-
-
         scale_matrix = new Matrix();
         rot_matrix = new Matrix();
         flip_matrix = new Matrix();
-
     }
 
     @Override
@@ -159,9 +158,6 @@ public class TileView extends View {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
         scale_matrix.postTranslate(width / 2f, height / 2f);
-
-
-
     }
 
     @Override
@@ -187,7 +183,7 @@ public class TileView extends View {
                     drawing.transform(flip_matrix);
                     drawing.transform(scale_matrix);
 
-                    canvas.drawPath(drawing, decoPaint);//TODO: add decoPaint
+                    canvas.drawPath(drawing, decoPaint);
                 }
             }
 
@@ -210,6 +206,13 @@ public class TileView extends View {
         //frozen = value < 0;
     }
 
+    public int getDecoColor() {
+        return decoColor;
+    }
+
+    public void setDecoColor(int decoColor) {
+        this.decoColor = decoColor;
+    }
 
     public void setTile(Tile tile) {
         this.tile = tile;

@@ -19,7 +19,7 @@ import gabygaby.hexatile.ui.TileGeneratorView;
 
 public class GameActivity extends Activity implements Board.BoardEventListener {
 
-    private static final String TAG = "Hexatile";
+    public static final String TAG = "hexatil.GameActivity";
 
     private Board board;
 

@@ -23,7 +23,7 @@ import gabygaby.hexatile.game.Tile;
 import gabygaby.hexatile.game.TileGenerator;
 
 /**
- * TODO: document your custom view class.
+ * This view enable to view and control the tile generator
  */
 public class TileGeneratorView extends ViewGroup implements TileGenerator.GeneratorListener {
 
@@ -302,7 +302,6 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             if (generator.isReserveFree()) {
                 //send tile to reserve
                 //don't select reserve
-                //TODO animate move
                 generator.toReserve();
             } else {
                 //select reserve

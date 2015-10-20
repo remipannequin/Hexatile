@@ -37,13 +37,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     public static final float COS = 0.866025f;
     public static final float SIN = 0.5f;
     private int meshColor = Color.GRAY;
+    private int decoColor = Color.WHITE;
 
     private Board board;
-
-
-
-
-
     private TileGenerator generator;
 
     private GestureDetector gestureDetector;
@@ -53,7 +49,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     private Paint meshPaint;
     private boolean blockMoving;
     private int tileHeight, tileWidth = 0;
-    private AnimatorSet collapseAnim;
     private CollapseAnimator collapseAnimator;
 
 
@@ -80,6 +75,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.BoardView, defStyle, 0);
         meshColor = a.getColor(
+                R.styleable.BoardView_meshColor,
+                meshColor);
+        decoColor = a.getColor(
                 R.styleable.BoardView_meshColor,
                 meshColor);
         a.recycle();
@@ -244,6 +242,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         int i = 0;
         for (Tile t : board.getTiles()) {
             TileView child = new TileView(getContext());
+            child.setDecoColor(decoColor);
             child.setTile(t);
             this.addView(child, i++);
         }
@@ -253,27 +252,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     public void setGenerator(TileGenerator generator) {
         this.generator = generator;
-    }
-
-    /**
-     * Gets the example color attribute value.
-     *
-     * @return The example color attribute value.
-     */
-    public int getMeshColor() {
-        return meshColor;
-    }
-
-
-    /**
-     * Sets the view'animatorSet example color attribute value. In the example view, this color
-     * is the font color.
-     *
-     * @param color The example color attribute value to use.
-     */
-    public void setMeshColor(int color) {
-        meshColor = color;
-        meshPaint.setColor(color);
     }
 
     /**
@@ -300,24 +278,19 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         flipInAnim.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
                 view.setDrawnLevel(origLevel);
-
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
             }
         });
         flipInAnim.setDuration(100);
@@ -381,6 +354,4 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         }
 
     }
-
-
 }

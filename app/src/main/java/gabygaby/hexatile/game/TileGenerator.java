@@ -1,10 +1,15 @@
 package gabygaby.hexatile.game;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
+
+import gabygaby.hexatile.GameActivity;
+import gabygaby.hexatile.MainActivity;
 
 /**
  * Generate Tiles
@@ -32,7 +37,7 @@ public class TileGenerator {
      * @return
      */
     private int generate() {
-        //TODO : generation law
+        //exponential generation law
         int level = 1;
         while (Math.random() > 0.75 || level > 6) {
             level++;
@@ -102,7 +107,7 @@ public class TileGenerator {
                 l.onReserveChanged();
             }
         } else {
-            //TODO warning or exception
+            Log.w(GameActivity.TAG, "trying to move a tile to the reserve, but it is not free");
         }
     }
 
