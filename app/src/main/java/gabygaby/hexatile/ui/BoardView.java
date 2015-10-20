@@ -1,7 +1,6 @@
 package gabygaby.hexatile.ui;
 
 import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -134,9 +133,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             if (selected.isFree()) {
                 int value = generator.consume();
                 board.fill(selected, value);
-
             } else {
-                //animate group
+                //TODO animate group
+
+
 
 
             }
@@ -146,12 +146,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int childCount = getChildCount();
-
         int paddingLeft = getPaddingStart();
         int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingEnd();
-        int paddingBottom = getPaddingBottom();
         int k;
         for (int i = 0; i < board.getHeight(); i++) {
             int offset = +(i % 2 == 1 ? 1 : 0);
@@ -172,7 +168,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         //case where the width is the limiting dimention
         tileWidth = (int)Math.floor(width / (board.getWidth()+0.5f))-1;
@@ -254,15 +249,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         this.generator = generator;
     }
 
-    /**
-     * Invalidate the boardView and all the childern tileViews
-     */
-    public void invalidateAll() {
-        invalidate();
-        for (int i = 0; i < getChildCount(); i++) {
-            getChildAt(i).invalidate();
-        }
-    }
 
     @Override
     public void onTileAdded(Tile newTile, boolean collapsing, final int origLevel) {
@@ -309,13 +295,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         blockMoving = true;
 
         final TileView promotedView = (TileView) getChildAt(promoted.getIndex());
-        float targetX = promotedView.getLeft();
-        float targetY = promotedView.getTop();
         collapseAnimator.setTarget(promotedView.getLeft(), promotedView.getTop());
         collapseAnimator.newGroup();
 
         for (Tile t : group) {
-            int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
             collapseAnimator.addTranslation(view, promoted.getLevel());
         }

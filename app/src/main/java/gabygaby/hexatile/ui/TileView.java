@@ -29,7 +29,6 @@ public class TileView extends View {
     private Path[] levelPath;
     private Matrix rot_matrix;
     private Matrix scale_matrix;
-    private boolean frozen;
     private Matrix flip_matrix;
     private int drawnLevel;
 
@@ -204,10 +203,6 @@ public class TileView extends View {
         flip_matrix.setScale(Math.abs(value), 1);
         //freeze drawnLevel from tile
         //frozen = value < 0;
-    }
-
-    public int getDecoColor() {
-        return decoColor;
     }
 
     public void setDecoColor(int decoColor) {

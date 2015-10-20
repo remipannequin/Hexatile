@@ -1,6 +1,5 @@
 package gabygaby.hexatile.game;
 
-import java.security.InvalidParameterException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,51 +29,22 @@ public class Tile {
         this.level = Math.min(level, 7);
     }
 
+
     public int getIndex() {
         return index;
     }
 
-    public void setIndex(int index) {
-        this.index = index;
-    }
-
-
-    public enum Position {left, up_left, up_right, right, down_right, down_left};
 
     public Tile(int index) {
         this.level = 0;
         this.index = index;
     }
 
+
     public Tile[] getNeighbours() {
         return new Tile[]{left, up_left, up_right, right, down_right, down_left};
     }
 
-    public void setTile(Tile neighbour, Position p) {
-        switch(p) {
-            case left:
-                setLeft(neighbour);
-                break;
-            case up_left:
-                setUpLeft(neighbour);
-                break;
-            case up_right:
-                setUpRight(neighbour);
-                break;
-            case right:
-                setUpRight(neighbour);
-                break;
-            case down_right:
-                setDownRight(neighbour);
-                break;
-            case down_left:
-                setDownLeft(neighbour);
-                break;
-            default:
-                //warning or exception
-                throw new InvalidParameterException();
-        }
-    }
 
     public int getLevel() {
         return level;
@@ -145,7 +115,7 @@ public class Tile {
      * @return the group (including the current tile)
      */
     public Set<Tile> findGroup() {
-        Set<Tile> group = new HashSet<Tile>();
+        Set<Tile> group = new HashSet<>();
         group.add(this);
         return findGroup(group);
     }

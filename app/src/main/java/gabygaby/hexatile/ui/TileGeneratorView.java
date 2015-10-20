@@ -9,11 +9,9 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
@@ -34,8 +32,6 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     private TileGenerator generator;
     private GestureDetector gestureDetector;
     private Tile[] tiles;
-
-    private boolean reserveSelected = false;
     private ObjectAnimator futureAnim;
     private ObjectAnimator reserveAnim;
 
@@ -101,22 +97,8 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     }
 
 
-    private void selectTile(float x, float y) {
-        if ((getWidth() - x) > (tileWidth * 2)) {
-            //on the reserve
-        } else {
-            //on the future tiles
-        }
-    }
-
-
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-
-        int paddingLeft = getPaddingStart();
-        int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingEnd();
-        int paddingBottom = getPaddingBottom();
 
         float x = 0.66f * getWidth();
         float t = 0.25f * tileHeight;
@@ -126,8 +108,8 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             float p = x - 1.5f * w;
             TileView v = (TileView) getChildAt(j);
 
-            int child_height = MeasureSpec.makeMeasureSpec((int) Math.round(h), MeasureSpec.EXACTLY);
-            int child_width = MeasureSpec.makeMeasureSpec((int) Math.round(w), MeasureSpec.EXACTLY);
+            int child_height = MeasureSpec.makeMeasureSpec(Math.round(h), MeasureSpec.EXACTLY);
+            int child_width = MeasureSpec.makeMeasureSpec(Math.round(w), MeasureSpec.EXACTLY);
 
             v.measure(child_width, child_height);
             v.layout(Math.round(p), Math.round(t), Math.round(p + w), Math.round(t + h));
@@ -224,39 +206,6 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     }
 
 
-    /**
-     * Gets the example color attribute value.
-     *
-     * @return The example color attribute value.
-     */
-    public int getMeshColor() {
-        return meshColor;
-    }
-
-
-    /**
-     * Sets the view'animatorSet example color attribute value. In the example view, this color
-     * is the font color.
-     *
-     * @param color The example color attribute value to use.
-     */
-    public void setMeshColor(int color) {
-        meshColor = color;
-        meshPaint.setColor(color);
-    }
-
-
-    /**
-     * Invalidate the boardView and all the childern tileViews
-     */
-    public void invalidateAll() {
-        invalidate();
-        for (int i = 0; i < getChildCount(); i++) {
-            getChildAt(i).invalidate();
-        }
-    }
-
-
     @Override
     public void onTileConsumed() {
         int i = 0;
@@ -306,13 +255,10 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             } else {
                 //select reserve
                 generator.selectReserve(true);
-
-
             }
         } else {
             //select futures
             generator.selectReserve(false);
-
         }
     }
 

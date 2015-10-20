@@ -50,8 +50,8 @@ public class CollapseAnimator {
     /**
      * Set the coordinates of the target tile (being promoted)
      *
-     * @param left
-     * @param top
+     * @param left the coordinate of the left of the promoted tile
+     * @param top the coordinate of the top of the promoted tile
      */
     public void setTarget(int left, int top) {
         this.targetX = left;
@@ -71,7 +71,7 @@ public class CollapseAnimator {
     /**
      * Add a Translation animation into a group
      *
-     * @param view
+     * @param view the tile to translate to the target
      */
     public void addTranslation(final TileView view, int level) {
         float deltaX = targetX - view.getX();
@@ -122,8 +122,8 @@ public class CollapseAnimator {
     /**
      * add a promotion animation into the group
      *
-     * @param view
-     * @param new_level
+     * @param view the tile to promote
+     * @param new_level the new level of the tile
      */
     public void addPromotion(final TileView view, final int new_level) {
 

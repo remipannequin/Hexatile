@@ -9,7 +9,6 @@ import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import gabygaby.hexatile.GameActivity;
-import gabygaby.hexatile.MainActivity;
 
 /**
  * Generate Tiles
@@ -25,7 +24,7 @@ public class TileGenerator {
     public TileGenerator(int bufferSize) {
         size = bufferSize;
         listeners = new ArrayList<>();
-        futures = new ArrayBlockingQueue<Integer>(bufferSize);
+        futures = new ArrayBlockingQueue<>(bufferSize);
         for (int i = 0; i < size; i++) {
             futures.add(generate());
         }
@@ -34,7 +33,7 @@ public class TileGenerator {
     /**
      * Generate a new tile
      *
-     * @return
+     * @return the level of the new tile
      */
     private int generate() {
         //exponential generation law
@@ -48,10 +47,10 @@ public class TileGenerator {
     /**
      * get the list of future tiles
      *
-     * @return
+     * @return the list of future tiles
      */
     public List<Integer> peekFutures() {
-        ArrayList<Integer> r = new ArrayList<Integer>();
+        ArrayList<Integer> r = new ArrayList<>();
         for (int v : futures) {
             r.add(v);
         }
@@ -60,7 +59,7 @@ public class TileGenerator {
     }
 
     /**
-     * @return
+     * @return the content of the reserve
      */
     public int peekReserve() {
         return reserve;
@@ -74,7 +73,7 @@ public class TileGenerator {
      * Get the last tile and update future tiles
      * Get the Tile from the reserve, and empty the reserve
      *
-     * @return
+     * @return the tile's level generated from the selected source
      */
     public int consume() {
         int v;
@@ -100,8 +99,7 @@ public class TileGenerator {
      */
     public void toReserve() {
         if (isReserveFree()) {
-            int v = consume();
-            reserve = v;
+            reserve = consume();
             for (GeneratorListener l : listeners) {
                 l.onTileConsumed();
                 l.onReserveChanged();
@@ -115,7 +113,7 @@ public class TileGenerator {
     /**
      * check if the reserve is occupied
      *
-     * @return
+     * @return true if the reserve contains a tile
      */
     public boolean isReserveFree() {
         return (reserve == 0);
