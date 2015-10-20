@@ -13,6 +13,8 @@ import android.view.animation.AccelerateInterpolator;
 public class CollapseAnimator {
 
 
+    public static final int PROMOTION_DURATION = 50;
+    public static final int COLLAPSE_DURATION = 200;
     private AnimatorSet set;
     private int targetY;
     private int targetX;
@@ -71,13 +73,13 @@ public class CollapseAnimator {
      *
      * @param view
      */
-    public void addTranslation(final TileView view) {
+    public void addTranslation(final TileView view, int level) {
         float deltaX = targetX - view.getX();
         float deltaY = targetY - view.getY();
         ObjectAnimator a1 = ObjectAnimator.ofFloat(view, "translationX", 0, deltaX);
         ObjectAnimator a2 = ObjectAnimator.ofFloat(view, "translationY", 0, deltaY);
-        a1.setDuration(500);
-        a2.setDuration(500);
+        a1.setDuration((long)(COLLAPSE_DURATION * (1 + level*0.5)));
+        a2.setDuration((long)(COLLAPSE_DURATION * (1 + level*0.5)));
         a1.setInterpolator(new AccelerateInterpolator());
         a2.setInterpolator(new AccelerateInterpolator());
 
@@ -126,7 +128,7 @@ public class CollapseAnimator {
     public void addPromotion(final TileView view, final int new_level) {
 
         ObjectAnimator fadeout = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
-        fadeout.setDuration(100);
+        fadeout.setDuration(PROMOTION_DURATION);
         fadeout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -158,7 +160,7 @@ public class CollapseAnimator {
 
 
         ObjectAnimator fadein = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
-        fadein.setDuration(100);
+        fadein.setDuration(PROMOTION_DURATION);
         fadein.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

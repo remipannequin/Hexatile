@@ -37,7 +37,7 @@ public class Board implements Parcelable {
         Tile new_tile;
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                new_tile = new Tile(this, j + i * width);
+                new_tile = new Tile(j + i * width);
                 tiles[j + i * width] = new_tile;
             }
         }
@@ -205,16 +205,17 @@ public class Board implements Parcelable {
     /**
      * Fill selected Tile, if it is empty, and enerate all cascading board events
      *
-     * @param selected
+     * @param selected selected Tile
+     * @param value the level to give to the new tile
      */
-    public void fill(Tile selected) {
+    public void fill(Tile selected, int value) {
         if (selected.isFree()) {
-            selected.fill();
+            selected.fill(value);
             dirty = true;
             stat.recordPutTile(selected.getLevel());//level is always 1 here
             boolean collapsing = (selected.findGroup().size() > Board.THRESHOLD);
             for (BoardEventListener l : listeners) {
-                l.onTileAdded(selected, collapsing);
+                l.onTileAdded(selected, collapsing, value);
             }
             while (isDirty()) {
                 Set<Tile> group = compute(selected);
@@ -249,8 +250,9 @@ public class Board implements Parcelable {
          *
          * @param newTile the new tile
          * @param collapsing if true, a collapse will follow
+         * @param origLevel the level of the added tile before any collapse
          */
-        void onTileAdded(Tile newTile, boolean collapsing);
+        void onTileAdded(Tile newTile, boolean collapsing, int origLevel);
 
         /**
          * A  group collapse, creating a new tile

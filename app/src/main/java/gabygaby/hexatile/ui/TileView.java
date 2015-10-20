@@ -58,8 +58,7 @@ public class TileView extends View {
 
 
         if (this.isInEditMode()) {
-            Tile t = new Tile(null,0);
-            t.setLevel(6);
+            Tile t = new Tile(6,0);
             setTile(t);
         }
 
@@ -227,6 +226,12 @@ public class TileView extends View {
     public void syncDrawnLevel() {
         if (tile != null) {
             drawnLevel = tile.getLevel();
+        }
+    }
+
+    public void setDrawnLevel(int level) {
+        if (tile != null) {
+            drawnLevel = level;
         }
     }
 

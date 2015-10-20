@@ -27,6 +27,7 @@ import java.util.Map;
 import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
+import gabygaby.hexatile.game.TileGenerator;
 
 /**
  * The view shows a Board instance, and enable the user to play with it i.e. select tiles
@@ -38,6 +39,12 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     private int meshColor = Color.GRAY;
 
     private Board board;
+
+
+
+
+
+    private TileGenerator generator;
 
     private GestureDetector gestureDetector;
     private List<Path> mesh;
@@ -127,7 +134,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         }
         if (selected != null) {
             if (selected.isFree()) {
-                board.fill(selected);
+                int value = generator.consume();
+                board.fill(selected, value);
+
             } else {
                 //animate group
 
@@ -242,6 +251,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     }
 
 
+    public void setGenerator(TileGenerator generator) {
+        this.generator = generator;
+    }
+
     /**
      * Gets the example color attribute value.
      *
@@ -274,7 +287,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     }
 
     @Override
-    public void onTileAdded(Tile newTile, boolean collapsing) {
+    public void onTileAdded(Tile newTile, boolean collapsing, final int origLevel) {
         //update selected tile (simple filling)
         final TileView view = (TileView) getChildAt(newTile.getIndex());
         ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
@@ -288,11 +301,13 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             @Override
             public void onAnimationStart(Animator animation) {
 
+                view.setDrawnLevel(origLevel);
+
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                view.incrDrawnLevel();
+
             }
 
             @Override
@@ -305,7 +320,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
             }
         });
-        flipInAnim.setDuration(250);
+        flipInAnim.setDuration(100);
         flipInAnim.setInterpolator(new AccelerateInterpolator(0.9f));
         if (collapsing) {
             collapseAnimator.reset(flipInAnim);
@@ -329,7 +344,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         for (Tile t : group) {
             int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
-            collapseAnimator.addTranslation(view);
+            collapseAnimator.addTranslation(view, promoted.getLevel());
         }
 
         final TileView view = (TileView) getChildAt(promoted.getIndex());

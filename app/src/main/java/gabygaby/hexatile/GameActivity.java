@@ -7,18 +7,24 @@ import android.os.Parcelable;
 import android.view.View;
 import android.widget.TextView;
 
-import java.util.Observable;
-import java.util.Observer;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.games.Games;
+import com.google.android.gms.plus.Plus;
 
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
+import gabygaby.hexatile.game.TileGenerator;
 import gabygaby.hexatile.ui.BoardView;
+import gabygaby.hexatile.ui.TileGeneratorView;
 
 public class GameActivity extends Activity implements Board.BoardEventListener {
 
     private static final String TAG = "Hexatile";
 
     private Board board;
+
+    private GoogleApiClient apiClient;
+    private TileGenerator generator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,17 +35,27 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
-        final View contentView = findViewById(R.id.fullscreen_content);
+        final BoardView boardView = (BoardView) findViewById(R.id.board_view);
 
 
         if (savedInstanceState == null) {
             board = new Board(5, 6);
         } else {
             Parcelable savedBoard = savedInstanceState.getParcelable("board");
-            board = (Board)savedBoard;
+            board = (Board) savedBoard;
         }
+        board.addListener(this);
+        ((BoardView) boardView).setBoard(board);
 
-        ((BoardView)contentView).setBoard(board);
+        generator = new TileGenerator(5);
+        TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
+        generatorView.setGenerator(generator);
+        boardView.setGenerator(generator);
+
+        apiClient = new GoogleApiClient.Builder(this)
+                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .build();
     }
 
     @Override
@@ -61,22 +77,24 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     public void gameOver() {
         //TODO: show statistics in a dialog
 
+        //publish score
+        Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic) , board.getScore());
     }
 
     public void updateScore() {
-        final TextView scoreView = (TextView)findViewById(R.id.scoreTextView);
+        final TextView scoreView = (TextView) findViewById(R.id.scoreTextView);
         scoreView.setText(String.format("%d", board.getScore()));
     }
 
     public void newGame(View view) {
         board.reset();
-        BoardView contentView = (BoardView) findViewById(R.id.fullscreen_content);
+        BoardView contentView = (BoardView) findViewById(R.id.board_view);
         contentView.invalidateAll();
         findViewById(R.id.scoreTextView).invalidate();
     }
 
     @Override
-    public void onTileAdded(Tile newTile, boolean collapsing) {
+    public void onTileAdded(Tile newTile, boolean collapsing, int origLevel) {
         //TODO Check achievements
     }
 

@@ -25,7 +25,7 @@
          />
 
     <gabygaby.hexatile.ui.BoardView xmlns:app="http://schemas.android.com/apk/res/gabygaby.hexatile"
-        android:id="@+id/fullscreen_content"
+        android:id="@+id/board_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:keepScreenOn="true"
@@ -40,6 +40,13 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_alignParentBottom="true" />
+
+    <gabygaby.hexatile.ui.TileGeneratorView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/generator_view"
+        android:layout_below="@+id/scoreTextView"
+        android:layout_alignParentStart="true" />
 
     <!-- This FrameLayout insets its children based on system windows using
          android:fitsSystemWindows. -->

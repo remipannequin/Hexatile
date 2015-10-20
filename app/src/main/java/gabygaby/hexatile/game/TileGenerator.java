@@ -8,7 +8,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 
 /**
  * Generate Tiles
- *
  */
 public class TileGenerator {
 
@@ -16,6 +15,7 @@ public class TileGenerator {
     private Queue<Integer> futures;
     private int reserve;
     private Collection<GeneratorListener> listeners;
+    private boolean reserveSelected = false;
 
     public TileGenerator(int bufferSize) {
         size = bufferSize;
@@ -28,15 +28,21 @@ public class TileGenerator {
 
     /**
      * Generate a new tile
+     *
      * @return
      */
     private int generate() {
         //TODO : generation law
-        return 1;
+        int level = 1;
+        while (Math.random() > 0.75 || level > 6) {
+            level++;
+        }
+        return level;
     }
 
     /**
      * get the list of future tiles
+     *
      * @return
      */
     public List<Integer> peekFutures() {
@@ -45,10 +51,10 @@ public class TileGenerator {
             r.add(v);
         }
         return r;
+
     }
 
     /**
-     *
      * @return
      */
     public int peekReserve() {
@@ -56,14 +62,30 @@ public class TileGenerator {
     }
 
     /**
+     * Get the tile value (level) either from the nomral source,
+     * or the tile stored in the reserve, depending on the source selected
+     * <p/>
+     * <p/>
      * Get the last tile and update future tiles
+     * Get the Tile from the reserve, and empty the reserve
+     *
      * @return
      */
     public int consume() {
-        int v = futures.poll();
-        futures.add(generate());
-        for (GeneratorListener l : listeners) {
-            l.onTileConsumed();
+        int v;
+        if (reserveSelected) {
+            v = reserve;
+            reserve = 0;
+            for (GeneratorListener l : listeners) {
+                l.onReserveChanged();
+            }
+            selectReserve(false);
+        } else {
+            v = futures.poll();
+            futures.add(generate());
+            for (GeneratorListener l : listeners) {
+                l.onTileConsumed();
+            }
         }
         return v;
     }
@@ -75,7 +97,7 @@ public class TileGenerator {
         if (isReserveFree()) {
             int v = consume();
             reserve = v;
-            for (GeneratorListener l :listeners) {
+            for (GeneratorListener l : listeners) {
                 l.onTileConsumed();
                 l.onReserveChanged();
             }
@@ -84,20 +106,10 @@ public class TileGenerator {
         }
     }
 
-    /**
-     * Get the Tile from the reserve, and empty the reserve
-     */
-    public int consumeReserve() {
-        int v = reserve;
-        reserve = 0;
-        for (GeneratorListener l :listeners) {
-            l.onReserveChanged();
-        }
-        return v;
-    }
 
     /**
      * check if the reserve is occupied
+     *
      * @return
      */
     public boolean isReserveFree() {
@@ -116,10 +128,23 @@ public class TileGenerator {
         listeners.clear();
     }
 
-    interface GeneratorListener {
+    public int getSize() {
+        return size;
+    }
+
+    public void selectReserve(boolean b) {
+        reserveSelected = b;
+        for(GeneratorListener l :listeners) {
+            l.onSourceChanged(reserveSelected);
+        }
+    }
+
+    public interface GeneratorListener {
         void onTileConsumed();
 
         void onReserveChanged();
+
+        void onSourceChanged(boolean fromReserve);
     }
 
 }

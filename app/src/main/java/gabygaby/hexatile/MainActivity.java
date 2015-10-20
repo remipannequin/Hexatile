@@ -52,10 +52,10 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
                 .build();
 
         final TileView bestTile = (TileView) findViewById(R.id.bestTileView);
-        Tile t = new Tile(null, 0);
+        Tile t = new Tile(0, 6);
         //TODO: get level from saved highscores
-        t.setLevel(6);
         bestTile.setTile(t);
+        bestTile.syncDrawnLevel();
         ObjectAnimator bestTileRotAnim = ObjectAnimator.ofFloat(bestTile, "flip", 0, 1);
         bestTileRotAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

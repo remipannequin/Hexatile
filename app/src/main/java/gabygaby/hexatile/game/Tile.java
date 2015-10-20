@@ -12,13 +12,17 @@ import java.util.Set;
 public class Tile {
 
     private Tile right, left, up_left, up_right, down_left, down_right;
-    private Board board;
     private int level;
     private int index;
 
-    public void fill() {
+    public Tile(int index, int v) {
+        this.level = v;
+        this.index = index;
+    }
+
+    public void fill(int value) {
         if (isFree()) {
-            level = 1;
+            level = value;
         }
     }
 
@@ -37,8 +41,7 @@ public class Tile {
 
     public enum Position {left, up_left, up_right, right, down_right, down_left};
 
-    public Tile(Board board, int index) {
-        this.board = board;
+    public Tile(int index) {
         this.level = 0;
         this.index = index;
     }

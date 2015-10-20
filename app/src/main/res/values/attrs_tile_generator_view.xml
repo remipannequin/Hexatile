@@ -1,0 +1,5 @@
+<resources>
+    <declare-styleable name="TileGeneratorView">
+        <attr name="decoColor" format="color" />
+    </declare-styleable>
+</resources>
