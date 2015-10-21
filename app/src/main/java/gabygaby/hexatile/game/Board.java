@@ -240,6 +240,10 @@ public class Board implements Parcelable {
         }
     }
 
+    public void setScore(int score) {
+        this.score = score;
+    }
+
 
     /**
      * Interface to be implemented by classes that wan't to be notified of game events

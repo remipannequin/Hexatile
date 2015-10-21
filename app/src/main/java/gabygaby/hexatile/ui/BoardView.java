@@ -340,6 +340,17 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     }
 
+    /**
+     * Invalidate all the child tiles. Usefull when setting the board
+     */
+    public void invalidateAll() {
+        for (int i = 0; i < getChildCount(); i++) {
+            TileView child = (TileView) getChildAt(i);
+            child.syncDrawnLevel();
+            child.invalidate();
+        }
+    }
+
 
     /**
      * Extends {@link GestureDetector.SimpleOnGestureListener} to provide custom gesture
