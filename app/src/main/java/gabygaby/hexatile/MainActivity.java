@@ -82,17 +82,17 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart(): connecting");
-        mGoogleApiClient.connect();
+        //Log.d(TAG, "onStart(): connecting");
+        //mGoogleApiClient.connect();
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop(): disconnecting");
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
-        }
+        //Log.d(TAG, "onStop(): disconnecting");
+        //if (mGoogleApiClient.isConnected()) {
+        //    mGoogleApiClient.disconnect();
+        //}
     }
 
 
