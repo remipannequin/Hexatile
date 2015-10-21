@@ -157,6 +157,8 @@ public class TileView extends View {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
         scale_matrix.postTranslate(width / 2f, height / 2f);
+        setPivotX(width/2f);
+        setPivotY(height/2f);
     }
 
     @Override

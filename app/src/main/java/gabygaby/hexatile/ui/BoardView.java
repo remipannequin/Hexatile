@@ -1,6 +1,7 @@
 package gabygaby.hexatile.ui;
 
 import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -12,17 +13,22 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.CycleInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import gabygaby.hexatile.GameActivity;
 import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -110,17 +116,17 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 result = true;
                 blockMoving = false;
             }
-            if (event.getAction() == MotionEvent.ACTION_MOVE && !blockMoving) {
+            /*if (event.getAction() == MotionEvent.ACTION_MOVE && !blockMoving) {
                 float x = event.getX();
                 float y = event.getY();
-                selectTile(x,y);
-            }
+                selectTile(x,y, false);
+            }*/
         }
         return result;
     }
 
 
-    private void selectTile(float x, float y) {
+    private void selectTile(float x, float y, boolean tap) {
         Tile selected = null;
         for (Map.Entry<PointF, Tile> center : centers.entrySet()) {
             double d = Math.pow(x - center.getKey().x, 2) + Math.pow(y - center.getKey().y, 2);
@@ -133,12 +139,23 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             if (selected.isFree()) {
                 int value = generator.consume();
                 board.fill(selected, value);
-            } else {
-                //TODO animate group
-
-
-
-
+            } else if (tap) {
+                //animate group only on tapping
+                Set<Tile> group = selected.findGroup();
+                AnimatorSet groupAnim = new AnimatorSet();
+                AnimatorSet.Builder builder = null;
+                for (Tile t : group) {
+                    TileView view = (TileView) getChildAt(t.getIndex());
+                    ObjectAnimator a = ObjectAnimator.ofFloat(view, "rotation", 0, 15);
+                    if (builder == null) {
+                        builder = groupAnim.play(a);
+                    } else {
+                        builder.with(a);
+                    }
+                }
+                groupAnim.setDuration(800);
+                groupAnim.setInterpolator(new CycleInterpolator(2));
+                groupAnim.start();
             }
         }
     }
@@ -332,9 +349,14 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            selectTile(e.getX(), e.getY());
-            return false;
+            selectTile(e.getX(), e.getY(), true);
+            return true;
         }
 
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            selectTile(e2.getX(), e2.getY(), false);
+            return true;
+        }
     }
 }
