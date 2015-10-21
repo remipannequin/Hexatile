@@ -100,7 +100,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         bestTile.getTile().setLevel(gp.bestTileEver());
         bestTile.syncDrawnLevel();
         if (gp.hasUnfinishedGame()) {
-            newGameButton.setText("Resume Game");
+            newGameButton.setText(R.string.button_resume_game);
         }
 
 
