@@ -52,10 +52,12 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     private Map<PointF, Tile> centers;
     private int additionalPadding;
     private Paint meshPaint;
-    private boolean blockMoving;
+
     private int tileHeight, tileWidth = 0;
     private CollapseAnimator collapseAnimator;
 
+    private boolean moving = false;
+    private boolean blockMoving;
 
     public BoardView(Context context) {
         super(context);
@@ -114,13 +116,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         if (!result) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 result = true;
-                blockMoving = false;
+                moving = false;
+                blockMoving = false;//reset the block when a new gesture begin
             }
-            /*if (event.getAction() == MotionEvent.ACTION_MOVE && !blockMoving) {
-                float x = event.getX();
-                float y = event.getY();
-                selectTile(x,y, false);
-            }*/
+
         }
         return result;
     }
@@ -139,6 +138,11 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             if (selected.isFree()) {
                 int value = generator.consume();
                 board.fill(selected, value);
+                // if the available tile in the generator is not the same than the last tile added,
+                // block selection on move
+                if (moving  && generator.peekFutures().get(0) != value) {
+                    blockMoving = true;
+                }
             } else if (tap) {
                 //animate group only on tapping
                 Set<Tile> group = selected.findGroup();
@@ -309,8 +313,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
         //block hover selection
-        blockMoving = true;
-
+        if (moving) {
+            blockMoving = true;
+        }
         final TileView promotedView = (TileView) getChildAt(promoted.getIndex());
         collapseAnimator.setTarget(promotedView.getLeft(), promotedView.getTop());
         collapseAnimator.newGroup();
@@ -350,13 +355,16 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             selectTile(e.getX(), e.getY(), true);
-            return true;
+            return false;
         }
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            selectTile(e2.getX(), e2.getY(), false);
-            return true;
+            moving = true;
+            if (!blockMoving) {
+                selectTile(e2.getX(), e2.getY(), false);
+            }
+            return false;
         }
     }
 }
