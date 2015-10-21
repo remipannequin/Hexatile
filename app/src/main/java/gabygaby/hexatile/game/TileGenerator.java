@@ -38,7 +38,7 @@ public class TileGenerator {
     private int generate() {
         //exponential generation law
         int level = 1;
-        while (Math.random() > 0.75 || level > 6) {
+        while (Math.random() < 0.16 || level > 6) {
             level++;
         }
         return level;
