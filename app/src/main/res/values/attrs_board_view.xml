@@ -2,5 +2,6 @@
     <declare-styleable name="BoardView">
         <attr name="tileSize" format="dimension" />
         <attr name="meshColor" format="color" />
+        <attr name="decoColor"/>
     </declare-styleable>
 </resources>

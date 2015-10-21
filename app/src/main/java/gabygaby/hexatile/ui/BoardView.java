@@ -13,17 +13,22 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
+import android.view.animation.Animation;
+import android.view.animation.CycleInterpolator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import gabygaby.hexatile.GameActivity;
 import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -37,13 +42,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     public static final float COS = 0.866025f;
     public static final float SIN = 0.5f;
     private int meshColor = Color.GRAY;
+    private int decoColor = Color.WHITE;
 
     private Board board;
-
-
-
-
-
     private TileGenerator generator;
 
     private GestureDetector gestureDetector;
@@ -51,11 +52,12 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     private Map<PointF, Tile> centers;
     private int additionalPadding;
     private Paint meshPaint;
-    private boolean blockMoving;
+
     private int tileHeight, tileWidth = 0;
-    private AnimatorSet collapseAnim;
     private CollapseAnimator collapseAnimator;
 
+    private boolean moving = false;
+    private boolean blockMoving;
 
     public BoardView(Context context) {
         super(context);
@@ -80,6 +82,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         final TypedArray a = getContext().obtainStyledAttributes(
                 attrs, R.styleable.BoardView, defStyle, 0);
         meshColor = a.getColor(
+                R.styleable.BoardView_meshColor,
+                meshColor);
+        decoColor = a.getColor(
                 R.styleable.BoardView_meshColor,
                 meshColor);
         a.recycle();
@@ -111,19 +116,16 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         if (!result) {
             if (event.getAction() == MotionEvent.ACTION_UP) {
                 result = true;
-                blockMoving = false;
+                moving = false;
+                blockMoving = false;//reset the block when a new gesture begin
             }
-            if (event.getAction() == MotionEvent.ACTION_MOVE && !blockMoving) {
-                float x = event.getX();
-                float y = event.getY();
-                selectTile(x,y);
-            }
+
         }
         return result;
     }
 
 
-    private void selectTile(float x, float y) {
+    private void selectTile(float x, float y, boolean tap) {
         Tile selected = null;
         for (Map.Entry<PointF, Tile> center : centers.entrySet()) {
             double d = Math.pow(x - center.getKey().x, 2) + Math.pow(y - center.getKey().y, 2);
@@ -136,11 +138,28 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             if (selected.isFree()) {
                 int value = generator.consume();
                 board.fill(selected, value);
-
-            } else {
-                //animate group
-
-
+                // if the available tile in the generator is not the same than the last tile added,
+                // block selection on move
+                if (moving  && generator.peekFutures().get(0) != value) {
+                    blockMoving = true;
+                }
+            } else if (tap) {
+                //animate group only on tapping
+                Set<Tile> group = selected.findGroup();
+                AnimatorSet groupAnim = new AnimatorSet();
+                AnimatorSet.Builder builder = null;
+                for (Tile t : group) {
+                    TileView view = (TileView) getChildAt(t.getIndex());
+                    ObjectAnimator a = ObjectAnimator.ofFloat(view, "rotation", 0, 15);
+                    if (builder == null) {
+                        builder = groupAnim.play(a);
+                    } else {
+                        builder.with(a);
+                    }
+                }
+                groupAnim.setDuration(800);
+                groupAnim.setInterpolator(new CycleInterpolator(2));
+                groupAnim.start();
             }
         }
     }
@@ -148,12 +167,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        int childCount = getChildCount();
-
         int paddingLeft = getPaddingStart();
         int paddingTop = getPaddingTop();
-        int paddingRight = getPaddingEnd();
-        int paddingBottom = getPaddingBottom();
         int k;
         for (int i = 0; i < board.getHeight(); i++) {
             int offset = +(i % 2 == 1 ? 1 : 0);
@@ -174,7 +189,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
         int width = MeasureSpec.getSize(widthMeasureSpec);
         //case where the width is the limiting dimention
         tileWidth = (int)Math.floor(width / (board.getWidth()+0.5f))-1;
@@ -244,6 +258,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         int i = 0;
         for (Tile t : board.getTiles()) {
             TileView child = new TileView(getContext());
+            child.setDecoColor(decoColor);
             child.setTile(t);
             this.addView(child, i++);
         }
@@ -255,36 +270,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         this.generator = generator;
     }
 
-    /**
-     * Gets the example color attribute value.
-     *
-     * @return The example color attribute value.
-     */
-    public int getMeshColor() {
-        return meshColor;
-    }
-
-
-    /**
-     * Sets the view'animatorSet example color attribute value. In the example view, this color
-     * is the font color.
-     *
-     * @param color The example color attribute value to use.
-     */
-    public void setMeshColor(int color) {
-        meshColor = color;
-        meshPaint.setColor(color);
-    }
-
-    /**
-     * Invalidate the boardView and all the childern tileViews
-     */
-    public void invalidateAll() {
-        invalidate();
-        for (int i = 0; i < getChildCount(); i++) {
-            getChildAt(i).invalidate();
-        }
-    }
 
     @Override
     public void onTileAdded(Tile newTile, boolean collapsing, final int origLevel) {
@@ -300,24 +285,19 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         flipInAnim.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
-
                 view.setDrawnLevel(origLevel);
-
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-
             }
 
             @Override
             public void onAnimationCancel(Animator animation) {
-
             }
 
             @Override
             public void onAnimationRepeat(Animator animation) {
-
             }
         });
         flipInAnim.setDuration(100);
@@ -333,16 +313,14 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
         //block hover selection
-        blockMoving = true;
-
+        if (moving) {
+            blockMoving = true;
+        }
         final TileView promotedView = (TileView) getChildAt(promoted.getIndex());
-        float targetX = promotedView.getLeft();
-        float targetY = promotedView.getTop();
         collapseAnimator.setTarget(promotedView.getLeft(), promotedView.getTop());
         collapseAnimator.newGroup();
 
         for (Tile t : group) {
-            int index = t.getIndex();
             final TileView view = (TileView) getChildAt(t.getIndex());
             collapseAnimator.addTranslation(view, promoted.getLevel());
         }
@@ -376,11 +354,17 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            selectTile(e.getX(), e.getY());
+            selectTile(e.getX(), e.getY(), true);
             return false;
         }
 
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            moving = true;
+            if (!blockMoving) {
+                selectTile(e2.getX(), e2.getY(), false);
+            }
+            return false;
+        }
     }
-
-
 }

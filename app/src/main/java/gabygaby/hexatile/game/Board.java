@@ -67,7 +67,7 @@ public class Board implements Parcelable {
     /**
      * Add a listener, that will be called when the board change
      *
-     * @param l
+     * @param l the listener to add
      */
     public void addListener(BoardEventListener l) {
         listeners.add(l);

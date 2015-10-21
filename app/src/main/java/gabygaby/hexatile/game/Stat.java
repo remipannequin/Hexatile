@@ -1,7 +1,5 @@
 package gabygaby.hexatile.game;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Class to store statistics about a game

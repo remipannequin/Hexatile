@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.view.View;
 import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -19,12 +18,11 @@ import gabygaby.hexatile.ui.TileGeneratorView;
 
 public class GameActivity extends Activity implements Board.BoardEventListener {
 
-    private static final String TAG = "Hexatile";
+    public static final String TAG = "hexatil.GameActivity";
 
     private Board board;
 
     private GoogleApiClient apiClient;
-    private TileGenerator generator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,17 +35,17 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         }
         final BoardView boardView = (BoardView) findViewById(R.id.board_view);
 
-
-        if (savedInstanceState == null) {
-            board = new Board(5, 6);
-        } else {
+        if (savedInstanceState != null) {
             Parcelable savedBoard = savedInstanceState.getParcelable("board");
             board = (Board) savedBoard;
         }
+        if (board == null) {
+            board = new Board(5, 6);
+        }
         board.addListener(this);
-        ((BoardView) boardView).setBoard(board);
+        boardView.setBoard(board);
 
-        generator = new TileGenerator(5);
+        TileGenerator generator = new TileGenerator(5);
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
@@ -78,19 +76,12 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         //TODO: show statistics in a dialog
 
         //publish score
-        Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic) , board.getScore());
+        Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic), board.getScore());
     }
 
     public void updateScore() {
         final TextView scoreView = (TextView) findViewById(R.id.scoreTextView);
         scoreView.setText(String.format("%d", board.getScore()));
-    }
-
-    public void newGame(View view) {
-        board.reset();
-        BoardView contentView = (BoardView) findViewById(R.id.board_view);
-        contentView.invalidateAll();
-        findViewById(R.id.scoreTextView).invalidate();
     }
 
     @Override
