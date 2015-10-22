@@ -76,8 +76,8 @@ public class CollapseAnimator {
     public void addTranslation(final TileView view, int level) {
         float deltaX = targetX - view.getX();
         float deltaY = targetY - view.getY();
-        ObjectAnimator a1 = ObjectAnimator.ofFloat(view, "translationX", 0, deltaX);
-        ObjectAnimator a2 = ObjectAnimator.ofFloat(view, "translationY", 0, deltaY);
+        ObjectAnimator a1 = ObjectAnimator.ofFloat(view, "translationX", 0, deltaX); //NON-NLS
+        ObjectAnimator a2 = ObjectAnimator.ofFloat(view, "translationY", 0, deltaY); //NON-NLS
         a1.setDuration((long)(COLLAPSE_DURATION * (1 + level*0.5)));
         a2.setDuration((long)(COLLAPSE_DURATION * (1 + level*0.5)));
         a1.setInterpolator(new AccelerateInterpolator());
@@ -127,7 +127,7 @@ public class CollapseAnimator {
      */
     public void addPromotion(final TileView view, final int new_level) {
 
-        ObjectAnimator fadeout = ObjectAnimator.ofFloat(view, "alpha", 1, 0);
+        ObjectAnimator fadeout = ObjectAnimator.ofFloat(view, "alpha", 1, 0); //NON-NLS
         fadeout.setDuration(PROMOTION_DURATION);
         fadeout.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
@@ -159,7 +159,7 @@ public class CollapseAnimator {
         });
 
 
-        ObjectAnimator fadein = ObjectAnimator.ofFloat(view, "alpha", 0, 1);
+        ObjectAnimator fadein = ObjectAnimator.ofFloat(view, "alpha", 0, 1); //NON-NLS
         fadein.setDuration(PROMOTION_DURATION);
         fadein.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override

@@ -21,7 +21,7 @@ import gabygaby.hexatile.game.Tile;
 public class TileView extends View {
 
     private Paint decoPaint;
-    private Paint[] tilePaint = new Paint[7];
+    private Paint[] tilePaint = new Paint[8];
     private int decoColor = Color.WHITE;
     private Tile tile;
     private Path drawing;
@@ -69,7 +69,7 @@ public class TileView extends View {
         decoPaint.setColor(decoColor);
 
         int[] levelColors = getContext().getResources().getIntArray(R.array.teal_theme);
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < 8; i++) {
             tilePaint[i] = new Paint();
             tilePaint[i].setStyle(Paint.Style.FILL);
             tilePaint[i].setColor(levelColors[i]);

@@ -15,10 +15,11 @@ import gabygaby.hexatile.game.Tile;
 import gabygaby.hexatile.game.TileGenerator;
 import gabygaby.hexatile.ui.BoardView;
 import gabygaby.hexatile.ui.TileGeneratorView;
+import gabygaby.hexatile.util.GamePersist;
 
 public class GameActivity extends Activity implements Board.BoardEventListener {
 
-    public static final String TAG = "hexatil.GameActivity";
+    public static final String TAG = "hexatil.GameActivity"; //NON-NLS
 
     private Board board;
 
@@ -35,16 +36,28 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         }
         final BoardView boardView = (BoardView) findViewById(R.id.board_view);
 
+
+
         if (savedInstanceState != null) {
-            Parcelable savedBoard = savedInstanceState.getParcelable("board");
+            Parcelable savedBoard = savedInstanceState.getParcelable("board"); //NON-NLS
             board = (Board) savedBoard;
         }
         if (board == null) {
-            board = new Board(5, 6);
+            GamePersist gp = GamePersist.getInstance();
+            if (!gp.isInitialized()) {
+                gp.init(getApplicationContext());
+            }
+            if (gp.hasUnfinishedGame()) {
+                board = gp.getBoard();
+            } else {
+                board = new Board(5, 6);
+                gp.startGame(board);
+            }
         }
         board.addListener(this);
         boardView.setBoard(board);
-
+        boardView.invalidateAll();
+        updateScore();
         TileGenerator generator = new TileGenerator(5);
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
@@ -63,7 +76,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("board", board);
+        outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
     }
 
@@ -81,7 +94,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
     public void updateScore() {
         final TextView scoreView = (TextView) findViewById(R.id.scoreTextView);
-        scoreView.setText(String.format("%d", board.getScore()));
+        scoreView.setText(String.format("%d", board.getScore())); //NON-NLS
     }
 
     @Override
