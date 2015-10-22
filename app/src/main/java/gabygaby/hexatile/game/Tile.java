@@ -183,4 +183,7 @@ public class Tile {
         return group;
     }
 
+    public int getKind() {
+        return kind;
+    }
 }

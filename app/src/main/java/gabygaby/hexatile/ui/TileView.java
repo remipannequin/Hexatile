@@ -21,7 +21,7 @@ import gabygaby.hexatile.game.Tile;
 public class TileView extends View {
 
     private Paint decoPaint;
-    private Paint[] tilePaint = new Paint[8];
+    private Paint[][] tilePaint = new Paint[4][8];
     private int decoColor = Color.WHITE;
     private Tile tile;
     private Path drawing;
@@ -68,13 +68,19 @@ public class TileView extends View {
         decoPaint.setStyle(Paint.Style.STROKE);
         decoPaint.setColor(decoColor);
 
-        int[] levelColors = getContext().getResources().getIntArray(R.array.vegetal_colors);
-        for (int i = 0; i < 8; i++) {
-            tilePaint[i] = new Paint();
-            tilePaint[i].setStyle(Paint.Style.FILL);
-            tilePaint[i].setColor(levelColors[i]);
+        int[] color_arrays = new int[] {
+                R.array.vegetal_colors,
+                R.array.water_colors,
+                R.array.fire_colors,
+                R.array.live_colors};
+        for (int k : color_arrays) {
+            int[] levelColors = getContext().getResources().getIntArray(k);
+            for (int i = 0; i < 8; i++) {
+                tilePaint[k][i]=new Paint();
+                tilePaint[k][i].setStyle(Paint.Style.FILL);
+                tilePaint[k][i].setColor(levelColors[i]);
+            }
         }
-
         // Update TextPaint and text measurements from attributes
         invalidateTextPaintAndMeasurements();
 
@@ -171,8 +177,9 @@ public class TileView extends View {
             //canvas.drawPath(drawing, meshPaint);
 
             if (drawnLevel > 0) {
+                int kind = tile.getKind();
                 drawing.transform(scale_matrix);
-                canvas.drawPath(drawing, tilePaint[drawnLevel]);
+                canvas.drawPath(drawing, tilePaint[kind][drawnLevel]);
             }
 
             if (drawnLevel >= 2 && levelPath[drawnLevel - 2] != null) {
@@ -183,17 +190,9 @@ public class TileView extends View {
                     levelPath[drawnLevel - 2].transform(rot_matrix, drawing);
                     drawing.transform(flip_matrix);
                     drawing.transform(scale_matrix);
-
                     canvas.drawPath(drawing, decoPaint);
                 }
             }
-
-        }
-    }
-
-    public void setAlpha(int value) {
-        for (Paint p : tilePaint) {
-            p.setAlpha(value);
         }
     }
 
