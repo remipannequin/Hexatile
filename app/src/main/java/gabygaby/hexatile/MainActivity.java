@@ -99,15 +99,16 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     @Override
     public void onSignInFailed() {
         // show sign-in button, hide the sign-out button
-        findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.GONE);
     }
 
     @Override
     public void onSignInSucceeded() {
         // show sign-in button, hide the sign-out button
-        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-        findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+        findViewById(R.id.sign_in_button).setVisibility(View.GONE);
+        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+
     }
 }
 
