@@ -25,7 +25,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     private Button newGameButton;
     private TileView bestTile;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,8 +52,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
-
-
     }
 
 
@@ -112,32 +109,5 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
         findViewById(R.id.sign_out_button).setVisibility(View.GONE);
     }
-
-
-
-
-    class Accomplishments {
-        boolean firstTileAchievement = false;
-        boolean over900Achievement = false;
-        boolean level3Achievement = false;
-        boolean level5Achievement = false;
-        boolean millionAchievement = false;
-        int score;
-
-
-        public void saveLocal(Context ctx) {
-            /* TODO: This is left as an exercise. To make it more difficult to cheat,
-             * this data should be stored in an encrypted file! And remember not to
-             * expose your encryption key (obfuscate it by building it from bits and
-             * pieces and/or XORing with another string, for instance). */
-        }
-
-        public void loadLocal(Context ctx) {
-            /* TODO: This is left as an exercise. Write code here that loads data
-             * from the file you wrote in saveLocal(). */
-        }
-    }
-
-
 }
 

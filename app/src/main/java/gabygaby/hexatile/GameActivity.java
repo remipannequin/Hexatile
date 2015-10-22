@@ -104,13 +104,30 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
-        //Check achievements
-        updateScore();
+        int level = promoted.getLevel();
+        if (level >= 2) {
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_first_tile));
+        }
+        if (level >= 4) {
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_3_));
+        }
+        if (level >= 6){
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_5_));
+        }
     }
 
     @Override
     public void onCascadeFinished() {
         //TODO Check achievements
+        //Check achievements
+        updateScore();
+        int current_score = board.getScore();
+        if (current_score > 9000) {
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_over_9000_));
+        }
+        if (current_score > 100000) {
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_100_000));
+        }
     }
 
     @Override
