@@ -12,5 +12,5 @@ Google Play game services IDs.
     <string name="achievement_over_9000_" translatable="false">CgkIi7Kw77ACEAIQAw</string>
     <string name="achievement_level_3_" translatable="false">CgkIi7Kw77ACEAIQBA</string>
     <string name="achievement_level_5_" translatable="false">CgkIi7Kw77ACEAIQBQ</string>
-    <string name="achievement_million" translatable="false">CgkIi7Kw77ACEAIQBg</string>
+    <string name="achievement_100_000" translatable="false">CgkIi7Kw77ACEAIQBg</string>
 </resources>
