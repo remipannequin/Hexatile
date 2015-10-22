@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hexatile</string>
+    <string name="best_score">Meilleur score</string>
+    <string name="button_resume_game">Reprendre la partie</string>
+    <string name="new_game">Nouvelle partie</string>
+    <string name="signin_other_error">erreur de connexion</string>
+    <string name="title_activity_game">Hexatile</string>
+    <string name="achievement">Réussite débloquée</string>
+</resources>
