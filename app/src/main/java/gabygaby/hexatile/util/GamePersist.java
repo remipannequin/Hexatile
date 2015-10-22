@@ -32,8 +32,8 @@ import gabygaby.hexatile.game.Tile;
  */
 public class GamePersist implements Board.BoardEventListener {
     private Context context;
-    String FILENAME_HIGHSCORE = "highscore";
-    String FILENAME_CURRENT = "current";
+    String FILENAME_HIGHSCORE = "highscore"; //NON-NLS
+    String FILENAME_CURRENT = "current"; //NON-NLS
 
     private int bestTile;
     private int highScore;
@@ -61,7 +61,7 @@ public class GamePersist implements Board.BoardEventListener {
             ByteBuffer buffer = ByteBuffer.allocate((int) fSize);
             chan.read(buffer);
             buffer.rewind();
-            highScore = buffer.getInt(highScore);
+            highScore = buffer.getInt();
             bestTile = buffer.getInt();
             fis.close();
 

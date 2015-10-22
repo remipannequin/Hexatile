@@ -19,7 +19,7 @@ import gabygaby.hexatile.util.GamePersist;
 
 public class GameActivity extends Activity implements Board.BoardEventListener {
 
-    public static final String TAG = "hexatil.GameActivity";
+    public static final String TAG = "hexatil.GameActivity"; //NON-NLS
 
     private Board board;
 
@@ -39,7 +39,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
 
         if (savedInstanceState != null) {
-            Parcelable savedBoard = savedInstanceState.getParcelable("board");
+            Parcelable savedBoard = savedInstanceState.getParcelable("board"); //NON-NLS
             board = (Board) savedBoard;
         }
         if (board == null) {
@@ -76,7 +76,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putParcelable("board", board);
+        outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
     }
 
@@ -94,7 +94,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
 
     public void updateScore() {
         final TextView scoreView = (TextView) findViewById(R.id.scoreTextView);
-        scoreView.setText(String.format("%d", board.getScore()));
+        scoreView.setText(String.format("%d", board.getScore())); //NON-NLS
     }
 
     @Override

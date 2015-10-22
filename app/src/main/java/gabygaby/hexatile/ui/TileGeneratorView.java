@@ -156,7 +156,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             i++;
         }
         final TileView last = (TileView) getChildAt(0);
-        futureAnim = ObjectAnimator.ofFloat(getChildAt(0), "flip", 0, 1);
+        futureAnim = ObjectAnimator.ofFloat(getChildAt(0), "flip", 0, 1); //NON-NLS
         futureAnim.setDuration(500);
         futureAnim.setRepeatMode(Animation.REVERSE);
         futureAnim.setRepeatCount(Animation.INFINITE);
@@ -185,7 +185,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
         tiles[i] = t;
         generator.addListener(this);
 
-        reserveAnim = ObjectAnimator.ofFloat(reserveView, "flip", 0, 1);
+        reserveAnim = ObjectAnimator.ofFloat(reserveView, "flip", 0, 1); //NON-NLS
         reserveAnim.setDuration(500);
         reserveAnim.setRepeatMode(Animation.REVERSE);
         reserveAnim.setRepeatCount(Animation.INFINITE);

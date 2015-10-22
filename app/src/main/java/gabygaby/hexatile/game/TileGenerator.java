@@ -105,7 +105,7 @@ public class TileGenerator {
                 l.onReserveChanged();
             }
         } else {
-            Log.w(GameActivity.TAG, "trying to move a tile to the reserve, but it is not free");
+            Log.w(GameActivity.TAG, "trying to move a tile to the reserve, but it is not free"); //NON-NLS
         }
     }
 

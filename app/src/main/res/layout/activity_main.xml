@@ -48,7 +48,7 @@
         android:layout_margin="50dp"
         android:enabled="true"
         android:onClick="onGameButtonClicked"
-        android:text="New Game" />
+        android:text="@string/new_game" />
 
     <gabygaby.hexatile.ui.TileView
         android:id="@+id/bestTileView"
@@ -75,7 +75,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/bestTileView"
         android:layout_centerHorizontal="true"
-        android:text="Best score"
+        android:text="@string/best_score"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textColor="@color/teal700"
         android:enabled="false" />

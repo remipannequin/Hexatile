@@ -150,7 +150,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 AnimatorSet.Builder builder = null;
                 for (Tile t : group) {
                     TileView view = (TileView) getChildAt(t.getIndex());
-                    ObjectAnimator a = ObjectAnimator.ofFloat(view, "rotation", 0, 15);
+                    ObjectAnimator a = ObjectAnimator.ofFloat(view, "rotation", 0, 15); //NON-NLS
                     if (builder == null) {
                         builder = groupAnim.play(a);
                     } else {
@@ -275,7 +275,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     public void onTileAdded(Tile newTile, boolean collapsing, final int origLevel) {
         //update selected tile (simple filling)
         final TileView view = (TileView) getChildAt(newTile.getIndex());
-        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1);
+        ObjectAnimator flipInAnim = ObjectAnimator.ofFloat(view, "flip", 0, 1); //NON-NLS
         flipInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {

@@ -26,7 +26,7 @@ public class Tile {
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(level, 7);
+        this.level = Math.min(level, 8);
     }
 
 

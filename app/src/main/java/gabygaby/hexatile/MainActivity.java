@@ -27,7 +27,7 @@ import gabygaby.hexatile.util.GamePersist;
 public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    public static final String TAG = "hexatile.MainActivity";
+    public static final String TAG = "hexatile.MainActivity"; //NON-NLS
     private static int RC_SIGN_IN = 9001;
 
     private GoogleApiClient mGoogleApiClient;
@@ -63,7 +63,7 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         Tile t = new Tile(0, 1);
         bestTile.setTile(t);
         bestTile.syncDrawnLevel();
-        ObjectAnimator bestTileRotAnim = ObjectAnimator.ofFloat(bestTile, "flip", 0, 1);
+        ObjectAnimator bestTileRotAnim = ObjectAnimator.ofFloat(bestTile, "flip", 0, 1); //NON-NLS
         bestTileRotAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -89,14 +89,13 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart()");
         //get level from saved highscores
         GamePersist gp = GamePersist.getInstance();
         if (!gp.isInitialized()) {
             gp.init(getApplicationContext());
         }
 
-        highscore.setText(String.format("%d", gp.highScore()));
+        highscore.setText(String.format("%d", gp.highScore())); //NON-NLS
         bestTile.getTile().setLevel(gp.bestTileEver());
         bestTile.syncDrawnLevel();
         if (gp.hasUnfinishedGame()) {
@@ -156,11 +155,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         if (mSignInClicked || mAutoStartSignInFlow) {
             mAutoStartSignInFlow = false;
             mSignInClicked = false;
-            mResolvingConnectionFailure = true;
-                if (!BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult,
-                        RC_SIGN_IN, getString(R.string.signin_other_error))) {
-                    mResolvingConnectionFailure = false;
-                }
+            mResolvingConnectionFailure = BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult,
+                    RC_SIGN_IN, getString(R.string.signin_other_error));
         }
 
         // Sign-in failed, so show sign-in button on main menu

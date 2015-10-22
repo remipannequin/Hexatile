@@ -11,4 +11,6 @@
     <string name="title_activity_game2">Hexatile</string>
     <string name="signin_other_error">error in sign in</string>
     <string name="button_resume_game">Resume Game</string>
+    <string name="best_score">Best score</string>
+    <string name="new_game">New Game</string>
 </resources>
