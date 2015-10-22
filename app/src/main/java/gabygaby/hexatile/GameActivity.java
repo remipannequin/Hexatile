@@ -9,6 +9,8 @@ import android.widget.TextView;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.plus.Plus;
+import com.google.example.games.basegameutils.BaseGameActivity;
+import com.google.example.games.basegameutils.GameHelper;
 
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -17,13 +19,11 @@ import gabygaby.hexatile.ui.BoardView;
 import gabygaby.hexatile.ui.TileGeneratorView;
 import gabygaby.hexatile.util.GamePersist;
 
-public class GameActivity extends Activity implements Board.BoardEventListener {
+public class GameActivity extends BaseGameActivity implements Board.BoardEventListener {
 
     public static final String TAG = "hexatil.GameActivity"; //NON-NLS
 
     private Board board;
-
-    private GoogleApiClient apiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +63,7 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
 
-        apiClient = new GoogleApiClient.Builder(this)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .build();
+
     }
 
     @Override
@@ -88,8 +85,11 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     public void gameOver() {
         //TODO: show statistics in a dialog
 
-        //publish score
-        Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic), board.getScore());
+        GoogleApiClient apiClient = getApiClient();
+        if (apiClient != null && apiClient.isConnected()) {
+            //publish score
+            Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic), board.getScore());
+        }
     }
 
     public void updateScore() {
@@ -105,15 +105,18 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
         int level = promoted.getLevel();
-        if (level >= 2) {
-            Games.Achievements.unlock(apiClient, getString(R.string.achievement_first_tile));
-        }
-        if (level >= 4) {
-            Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_3_));
-        }
-        if (level >= 6){
-            Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_5_));
-        }
+        GoogleApiClient apiClient = getApiClient();
+        if (apiClient != null && apiClient.isConnected()) {
+            if (level >= 2) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_first_tile));
+            }
+            if (level >= 4) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_3_));
+            }
+            if (level >= 6) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_5_));
+            }
+        } //TODO: if not connected : record progress and send it later
     }
 
     @Override
@@ -122,16 +125,29 @@ public class GameActivity extends Activity implements Board.BoardEventListener {
         //Check achievements
         updateScore();
         int current_score = board.getScore();
-        if (current_score > 9000) {
-            Games.Achievements.unlock(apiClient, getString(R.string.achievement_over_9000_));
-        }
-        if (current_score > 100000) {
-            Games.Achievements.unlock(apiClient, getString(R.string.achievement_100_000));
-        }
+        GoogleApiClient apiClient = getApiClient();
+        if (apiClient != null && apiClient.isConnected()) {
+            if (current_score > 9000) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_over_9000_));
+            }
+            if (current_score > 100000) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_100_000));
+            }
+        } //TODO: if not connected : record progress and send it later
     }
 
     @Override
     public void onGameOver() {
         gameOver();
+    }
+
+    @Override
+    public void onSignInFailed() {
+
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+
     }
 }
