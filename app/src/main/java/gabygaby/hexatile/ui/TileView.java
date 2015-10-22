@@ -31,6 +31,8 @@ public class TileView extends View {
     private Matrix scale_matrix;
     private Matrix flip_matrix;
     private int drawnLevel;
+    private boolean mutable = false;
+    private Path plusPath;
 
     public TileView(Context context) {
         super(context);
@@ -146,6 +148,13 @@ public class TileView extends View {
         levelPath[5].lineTo(0, 0.5f);
         levelPath[5].lineTo(-BoardView.COS/4f, 0.125f);
 
+        plusPath = new Path();
+        plusPath.moveTo(0, 0.3f);
+        plusPath.lineTo(0, -0.3f);
+        plusPath.moveTo(0.3f, 0);
+        plusPath.lineTo(-0.3f, 0);
+
+
         scale_matrix = new Matrix();
         rot_matrix = new Matrix();
         flip_matrix = new Matrix();
@@ -164,7 +173,7 @@ public class TileView extends View {
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
         scale_matrix.postTranslate(width / 2f, height / 2f);
         setPivotX(width/2f);
-        setPivotY(height/2f);
+        setPivotY(height / 2f);
     }
 
     @Override
@@ -192,6 +201,13 @@ public class TileView extends View {
                     drawing.transform(scale_matrix);
                     canvas.drawPath(drawing, decoPaint);
                 }
+            }
+
+            if (mutable) {
+                drawing.reset();
+                plusPath.transform(flip_matrix, drawing);
+                drawing.transform(scale_matrix);
+                canvas.drawPath(drawing, decoPaint);
             }
         }
     }
@@ -225,6 +241,7 @@ public class TileView extends View {
     public void syncDrawnLevel() {
         if (tile != null) {
             drawnLevel = tile.getLevel();
+            mutable = tile.isMutable();
         }
     }
 
