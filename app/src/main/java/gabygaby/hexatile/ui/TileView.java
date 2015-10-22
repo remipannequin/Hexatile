@@ -68,7 +68,7 @@ public class TileView extends View {
         decoPaint.setStyle(Paint.Style.STROKE);
         decoPaint.setColor(decoColor);
 
-        int[] levelColors = getContext().getResources().getIntArray(R.array.teal_theme);
+        int[] levelColors = getContext().getResources().getIntArray(R.array.vegetal_colors);
         for (int i = 0; i < 8; i++) {
             tilePaint[i] = new Paint();
             tilePaint[i].setStyle(Paint.Style.FILL);
