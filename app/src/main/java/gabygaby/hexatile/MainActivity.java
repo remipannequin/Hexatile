@@ -2,42 +2,25 @@ package gabygaby.hexatile;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.games.Games;
-import com.google.android.gms.games.Player;
-import com.google.android.gms.plus.Plus;
-import com.google.example.games.basegameutils.BaseGameUtils;
+import com.google.example.games.basegameutils.BaseGameActivity;
 
 import gabygaby.hexatile.game.Tile;
 import gabygaby.hexatile.ui.TileView;
 import gabygaby.hexatile.util.GamePersist;
 
-public class MainActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
+public class MainActivity extends BaseGameActivity implements View.OnClickListener {
 
     public static final String TAG = "hexatile.MainActivity"; //NON-NLS
-    private static int RC_SIGN_IN = 9001;
 
-    private GoogleApiClient mGoogleApiClient;
-
-    // Has the user clicked the sign-in button?
-    private boolean mSignInClicked = false;
-
-    // Automatically start the sign-in flow when the Activity starts
-    private boolean mAutoStartSignInFlow = true;
-    private boolean mResolvingConnectionFailure;
     private TextView highscore;
     private Button newGameButton;
     private TileView bestTile;
@@ -48,14 +31,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-
-        // Create the Google API Client with access to Plus and Games
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .build();
 
         highscore = (TextView) findViewById(R.id.highScoreTextView);
         newGameButton = (Button) findViewById(R.id.gameButton);
@@ -82,9 +57,6 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
 
     }
 
-    private boolean isSignedIn() {
-        return (mGoogleApiClient != null && mGoogleApiClient.isConnected());
-    }
 
     @Override
     protected void onStart() {
@@ -101,67 +73,8 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         if (gp.hasUnfinishedGame()) {
             newGameButton.setText(R.string.button_resume_game);
         }
-
-
-        //mGoogleApiClient.connect();
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        //Log.d(TAG, "onStop(): disconnecting");
-        //if (mGoogleApiClient.isConnected()) {
-        //    mGoogleApiClient.disconnect();
-        //}
-    }
-
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        Log.d(TAG, "onConnected(): connected to Google APIs");
-        // Show sign-out button on main menu
-
-
-        // Show "you are signed in" message on win screen, with no sign in button.
-
-
-        // Set the greeting appropriately on main menu
-        Player p = Games.Players.getCurrentPlayer(mGoogleApiClient);
-        String displayName;
-        if (p == null) {
-            Log.w(TAG, "mGamesClient.getCurrentPlayer() is NULL!");
-            displayName = "???";
-        } else {
-            displayName = p.getDisplayName();
-        }
-
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended(): attempting to connect");
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed(): attempting to resolve");
-        if (mResolvingConnectionFailure) {
-            Log.d(TAG, "onConnectionFailed(): already resolving");
-            return;
-        }
-
-        if (mSignInClicked || mAutoStartSignInFlow) {
-            mAutoStartSignInFlow = false;
-            mSignInClicked = false;
-            mResolvingConnectionFailure = BaseGameUtils.resolveConnectionFailure(this, mGoogleApiClient, connectionResult,
-                    RC_SIGN_IN, getString(R.string.signin_other_error));
-        }
-
-        // Sign-in failed, so show sign-in button on main menu
-
-    }
 
     /**
      * Called when clicking the singIn signOut buttons
@@ -169,33 +82,10 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
      * @param view
      */
     public void onClick(View view) {
-        // start the sign-in flow
-        mSignInClicked = true;
-        mGoogleApiClient.connect();
-
-        if (view.getId() == R.id.sign_in_button) {
-            // start the asynchronous sign in flow
-            mSignInClicked = true;
-            mGoogleApiClient.connect();
-        } else if (view.getId() == R.id.sign_out_button) {
-            // sign out.
-            mSignInClicked = false;
-            Games.signOut(mGoogleApiClient);
-
-            // show sign-in button, hide the sign-out button
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_button).setVisibility(View.GONE);
-        }
-
-
-    }
-
-
-    public void onSignOutButtonClicked() {
-        mSignInClicked = false;
-        Games.signOut(mGoogleApiClient);
-        if (mGoogleApiClient.isConnected()) {
-            mGoogleApiClient.disconnect();
+        if (isSignedIn()) {
+            signOut();
+        } else {
+            beginUserInitiatedSignIn();
         }
     }
 
@@ -208,6 +98,22 @@ public class MainActivity extends Activity implements GoogleApiClient.Connection
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }
+
+    @Override
+    public void onSignInFailed() {
+        // show sign-in button, hide the sign-out button
+        findViewById(R.id.sign_in_button).setVisibility(View.GONE);
+        findViewById(R.id.sign_out_button).setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onSignInSucceeded() {
+        // show sign-in button, hide the sign-out button
+        findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
+        findViewById(R.id.sign_out_button).setVisibility(View.GONE);
+    }
+
+
 
 
     class Accomplishments {
