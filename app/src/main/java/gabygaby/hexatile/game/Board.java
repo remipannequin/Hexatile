@@ -114,11 +114,11 @@ public class Board implements Parcelable {
         Set<Tile> group = last.findGroup();
         group.remove(last);
         if (group.size() >= THRESHOLD) {
+            int group_value = 0;
             for (Tile t : group) {
-                t.consume();
-
+                group_value += t.consume();
             }
-            last.promote();
+            last.promote(group_value);
             int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
             stat.recordScore(last.getLevel(), reward);
             score += reward;

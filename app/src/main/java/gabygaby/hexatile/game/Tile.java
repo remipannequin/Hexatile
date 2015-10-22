@@ -4,24 +4,44 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Representation of an hexagonal tile on the board
+ * Logical representation of an hexagonal tile on the board
  *
  * Created by Rémi Pannequin on 25/09/15.
  */
 public class Tile {
 
+    /**
+     * neighbours
+     */
     private Tile right, left, up_left, up_right, down_left, down_right;
+    /**
+     * level of this tile
+     */
     private int level;
+    /**
+     * Kind of the tile it is
+     */
+    private int kind;
+    /**
+     * index of the tile in the board
+     */
     private int index;
+    /**
+     * the total number of level 1 tiles that have been fused to create this tile
+     */
+    private int value;
 
     public Tile(int index, int v) {
         this.level = v;
+        kind = 0;
         this.index = index;
     }
 
-    public void fill(int value) {
+    public void fill(int level) {
         if (isFree()) {
-            level = value;
+            this.kind = 1;
+            this.level = level;
+            this.value = (int)Math.pow(4, level - 1);
         }
     }
 
@@ -50,12 +70,40 @@ public class Tile {
         return level;
     }
 
-    public void promote() {
+    /**
+     * increment the tile's level
+     */
+    public void promote(int group_value) {
         setLevel(this.level + 1);
+        value += group_value;
     }
 
-    public void consume() {
+    /**
+     * increment the tile's kind
+     */
+    public void mutate() {
+        kind++;
+        level--;
+    }
+
+    /**
+     *
+     */
+    public boolean isMutable() {
+        return (level >= 2 && (Math.pow(4 + kind, level - 1) <= value));
+    }
+
+    /**
+     * Cunsume this tile (in a colapse event)
+     * reset its level, kind and value.
+     * @return the value of the tile, to be added to the promoted tile
+     */
+    public int consume() {
+        int v = value;
         this.level = 0;
+        this.value = 0;
+        this.kind = 0;
+        return v;
     }
 
     public Tile getRight() {
