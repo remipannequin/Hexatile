@@ -143,6 +143,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
 
     public void setGenerator(TileGenerator generator) {
+        removeAllViews();
         this.generator = generator;
         tiles = new Tile[generator.getSize() + 1];
         int i = 0;
