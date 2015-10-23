@@ -40,8 +40,6 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         }
         boardView = (BoardView) findViewById(R.id.board_view);
 
-
-
         if (savedInstanceState != null) {
             Parcelable savedBoard = savedInstanceState.getParcelable("board"); //NON-NLS
             board = (Board) savedBoard;
@@ -72,11 +70,11 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
      * Restart the game
      */
     private void restart() {
-        board = new Board(5, 6);
         GamePersist gp = GamePersist.getInstance();
-            if (!gp.isInitialized()) {
-                gp.init(getApplicationContext());
-            }
+        if (!gp.isInitialized()) {
+            gp.init(getApplicationContext());
+        }
+        board = new Board(5, 6);
         gp.startGame(board);
         board.addListener(this);
         boardView.setBoard(board);
@@ -98,11 +96,6 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
     }
 
     public void gameOver() {

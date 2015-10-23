@@ -178,6 +178,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
         int v = generator.peekReserve();
         Tile t = new Tile(i, v);
+        t.setKind(1);
         final TileView reserveView = new TileView(getContext());
         reserveView.setTile(t);
         reserveView.syncDrawnLevel();

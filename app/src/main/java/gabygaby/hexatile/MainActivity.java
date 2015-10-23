@@ -74,6 +74,21 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
 
     /**
      * Called when clicking the singIn signOut buttons
