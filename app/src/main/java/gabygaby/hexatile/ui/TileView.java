@@ -241,6 +241,9 @@ public class TileView extends View {
 
     public void incrDrawnLevel() {
         drawnLevel++;
+        if (tile != null) {
+            mutable = tile.isMutable();
+        }
     }
 
     public void syncDrawnLevel() {
