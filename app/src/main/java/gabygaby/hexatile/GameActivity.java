@@ -74,18 +74,18 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     private void restart() {
         board = new Board(5, 6);
         GamePersist gp = GamePersist.getInstance();
-            if (!gp.isInitialized()) {
-                gp.init(getApplicationContext());
-            }
+        if (!gp.isInitialized()) {
+            gp.init(getApplicationContext());
+        }
         gp.startGame(board);
         board.addListener(this);
         boardView.setBoard(board);
-        boardView.invalidateAll();
         updateScore();
         TileGenerator generator = new TileGenerator(5);
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
+        boardView.invalidateAll();
     }
 
     @Override
