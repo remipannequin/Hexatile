@@ -180,7 +180,9 @@ public class Tile {
      */
     private Set<Tile> findGroup(Set<Tile> group) {
         for (Tile neighbour: getNeighbours()) {
-            if (neighbour.getLevel() == level && !group.contains(neighbour)) {
+            if (neighbour.getLevel() == level &&
+                    neighbour.getKind() == kind &&
+                    !group.contains(neighbour)) {
                 group.add(neighbour);
                 neighbour.findGroup(group);
             }
