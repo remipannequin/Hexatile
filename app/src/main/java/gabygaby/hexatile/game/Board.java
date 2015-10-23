@@ -152,15 +152,6 @@ public class Board implements Parcelable {
         return true;
     }
 
-    /**
-     * Reset the game
-     */
-    public void reset() {
-        for (Tile t : tiles) {
-            t.consume();
-        }
-        score = 0;
-    }
 
     public boolean isDirty() {
         return dirty;
@@ -178,6 +169,8 @@ public class Board implements Parcelable {
         dest.writeInt(height);
 
         int[] levels = new int[width * height];
+
+
         int i = 0;
         for (Tile t : tiles) {
 

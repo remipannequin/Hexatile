@@ -1,6 +1,12 @@
 package gabygaby.hexatile.game;
 
 
+import android.util.Log;
+
+import java.security.InvalidParameterException;
+
+import gabygaby.hexatile.GameActivity;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +24,13 @@ public class Stat {
     private List<Float> boardOccupation;
     private int[] tileMutated;
 
+    
+        
     public Stat(int boardSize) {
         this.boardSize = boardSize;
-        this.scoreEventCount = new int[6];
-        this.scoreByLevel = new int[6];
-        this.tilesAdded = new int[7];
+        this.scoreEventCount = new int[Tile.MAX_TILE_LEVEL+1];
+        this.scoreByLevel = new int[Tile.MAX_TILE_LEVEL+1];
+        this.tilesAdded = new int[Tile.MAX_TILE_LEVEL+1];
         this.tileMutated = new int[3];
         this.boardOccupation = new ArrayList<>();
     }
@@ -34,6 +42,9 @@ public class Stat {
     }
 
     public void recordPutTile(int level) {
+        if (level < 0 || level > Tile.MAX_TILE_LEVEL) {
+            throw new InvalidParameterException(String.format("invalid level %d to record", level));
+        }
         tilesAdded[level]++;
     }
 

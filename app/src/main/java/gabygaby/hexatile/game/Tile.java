@@ -9,6 +9,8 @@ import java.util.Set;
  * Created by Rémi Pannequin on 25/09/15.
  */
 public class Tile {
+    
+    public static final int MAX_TILE_LEVEL = 8;
 
     /**
      * neighbours
@@ -51,7 +53,7 @@ public class Tile {
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(level, 8);
+        this.level = Math.min(level, MAX_TILE_LEVEL);
     }
 
 

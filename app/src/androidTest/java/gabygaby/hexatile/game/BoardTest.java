@@ -1,6 +1,7 @@
 package gabygaby.hexatile.game;
 
 import android.test.suitebuilder.annotation.SmallTest;
+import android.test.suitebuilder.annotation.LargeTest;
 
 import junit.framework.TestCase;
 
@@ -27,7 +28,33 @@ public class BoardTest extends TestCase {
         assertEquals(t2.getDownRight(),instance.getTile(0,0));
         assertEquals(t2.getUpLeft(), instance.getTile(2,4));
         assertEquals(t2.getUpRight(),instance.getTile(2,0));
+    }
 
+    @LargeTest
+    public void testRandomPlay() {
+        int[] scores = new int[10000];
+        for (int i = 0; i < scores.length; i++) {
+            TileGenerator gene = new TileGenerator(1);
+            Board instance = new Board(5, 6);
+            while (!instance.isGameOver()) {
+                for (Tile t : instance.getTiles()) {
+                    if (t.isFree()) {
+                        instance.fill(t, gene.consume());
+                    }
+                }
+            }
+            scores[i] = instance.getScore();
+            System.out.println(String.format("game %d/%d : score %d",
+                    i, scores.length, instance.getScore()));
+        }
+        double total = 0, min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+        for (Integer s : scores) {
+            total += s;
+            min = Math.min(min, s);
+            max = Math.max(max, s);
+        }
+
+        System.out.println(String.format("mean %f, min %f, max %f", total/ scores.length, min, max));
 
     }
 
