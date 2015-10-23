@@ -186,9 +186,10 @@ public class GamePersist implements Board.BoardEventListener {
         int score = board.getScore();
         if (highScore < score) {
             highScore = score;
+            write_score();
         }
         board = null;
-        write_score();
+        write_board();
     }
 
     @Override
