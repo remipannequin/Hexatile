@@ -86,6 +86,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
+
     }
 
     @Override
@@ -185,7 +186,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
 
     @Override
     public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
-
+        updateScore();
     }
 
     @Override
