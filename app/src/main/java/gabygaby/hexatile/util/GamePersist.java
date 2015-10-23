@@ -85,6 +85,7 @@ public class GamePersist implements Board.BoardEventListener {
             for (Tile t: tiles) {
                 short level = buffer.getShort();
                 short kind = buffer.getShort();
+                if (kind == 0 && level != 0) {kind = 1;}
                 int value = buffer.getInt();
                 t.setLevel(level);
                 t.setKind(kind);
