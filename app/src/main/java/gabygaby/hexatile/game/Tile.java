@@ -97,7 +97,11 @@ public class Tile {
      *
      */
     public boolean isMutable() {
-        return (level >= 2 && (Math.pow(4 + kind, level - 1) <= value));
+        if (level < 2) {
+            return false;
+        }
+        int limit = (int)Math.pow(5, kind) * (int)Math.pow(4, level - kind - 1);
+        return value >= limit;
     }
 
     /**
