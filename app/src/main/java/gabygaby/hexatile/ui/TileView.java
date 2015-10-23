@@ -75,21 +75,17 @@ public class TileView extends View {
                 R.array.water_colors,
                 R.array.fire_colors,
                 R.array.live_colors};
-        for (int k : color_arrays) {
-            int[] levelColors = getContext().getResources().getIntArray(k);
+        for (int k = 0; k < color_arrays.length; k++) {
+            int[] levelColors = getContext().getResources().getIntArray(color_arrays[k]);
             for (int i = 0; i < 8; i++) {
                 tilePaint[k][i]=new Paint();
                 tilePaint[k][i].setStyle(Paint.Style.FILL);
                 tilePaint[k][i].setColor(levelColors[i]);
             }
         }
-        // Update TextPaint and text measurements from attributes
-        invalidateTextPaintAndMeasurements();
+
 
         drawing = new Path();
-    }
-
-    private void invalidateTextPaintAndMeasurements() {
 
         hexa = new Path();
         hexa.moveTo(0, 1);
@@ -127,7 +123,7 @@ public class TileView extends View {
         levelPath[3].lineTo(0, 0.7f);
 
         levelPath[4] = new Path();
-        levelPath[4].moveTo(BoardView.COS/4f, 0.375f);
+        levelPath[4].moveTo(BoardView.COS / 4f, 0.375f);
         levelPath[4].lineTo(0, 0.5f);
         levelPath[4].lineTo(0, 0.7f);
         levelPath[4].lineTo(0.1f, 0.7f);
@@ -138,7 +134,7 @@ public class TileView extends View {
         levelPath[4].lineTo(-BoardView.COS/4f, 0.375f);
 
         levelPath[5] = new Path();
-        levelPath[5].moveTo(BoardView.COS/4f, 0.125f);
+        levelPath[5].moveTo(BoardView.COS / 4f, 0.125f);
         levelPath[5].lineTo(0, 0.5f);
         levelPath[5].lineTo(0, 0.7f);
         levelPath[5].lineTo(0.1f, 0.7f);
@@ -184,11 +180,12 @@ public class TileView extends View {
             drawing.reset();
             hexa.transform(flip_matrix, drawing);
             //canvas.drawPath(drawing, meshPaint);
+            int kind = tile.getKind();
+            if (drawnLevel > 0 && kind >= 1) {
 
-            if (drawnLevel > 0) {
-                int kind = tile.getKind();
                 drawing.transform(scale_matrix);
-                canvas.drawPath(drawing, tilePaint[kind][drawnLevel]);
+                // vegetal is 1, 0 is for empty tiles
+                canvas.drawPath(drawing, tilePaint[kind-1][drawnLevel]);
             }
 
             if (drawnLevel >= 2 && levelPath[drawnLevel - 2] != null) {

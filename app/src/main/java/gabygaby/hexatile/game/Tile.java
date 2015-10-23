@@ -31,9 +31,14 @@ public class Tile {
      */
     private int value;
 
+    /**
+     * CReate a new tile. If level is not zero, the kind is the first (vegetal)
+     * @param index
+     * @param v
+     */
     public Tile(int index, int v) {
         this.level = v;
-        kind = 0;
+        kind = (level == 0 ? 0 : 1);
         this.index = index;
     }
 
