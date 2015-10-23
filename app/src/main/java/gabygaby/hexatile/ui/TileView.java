@@ -1,6 +1,7 @@
 package gabygaby.hexatile.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,6 +9,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 
 import gabygaby.hexatile.R;
@@ -33,6 +35,7 @@ public class TileView extends View {
     private int drawnLevel;
     private boolean mutable = false;
     private Path plusPath;
+    private float strokeWidth;
 
     public TileView(Context context) {
         super(context);
@@ -57,8 +60,13 @@ public class TileView extends View {
                 R.styleable.TileView_decoColor,
                 decoColor);
 
-        a.recycle();
+        Resources r = getResources();
+        strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, r.getDisplayMetrics());
+        strokeWidth = a.getDimension(
+            R.styleable.TileView_strokeWidth,
+            strokeWidth);
 
+        a.recycle();
 
         if (this.isInEditMode()) {
             Tile t = new Tile(6,0);
@@ -66,7 +74,7 @@ public class TileView extends View {
         }
 
         decoPaint = new Paint();
-        decoPaint.setStrokeWidth(4);
+        decoPaint.setStrokeWidth(strokeWidth);
         decoPaint.setStyle(Paint.Style.STROKE);
         decoPaint.setColor(decoColor);
 
@@ -168,7 +176,7 @@ public class TileView extends View {
         int height = MeasureSpec.getSize(heightMeasureSpec);
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
         scale_matrix.postTranslate(width / 2f, height / 2f);
-        setPivotX(width/2f);
+        setPivotX(width / 2f);
         setPivotY(height / 2f);
     }
 

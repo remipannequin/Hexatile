@@ -5,6 +5,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -14,6 +15,7 @@ import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -93,8 +95,11 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         collapseAnimator = new CollapseAnimator();
         centers = new HashMap<>();
         mesh = new ArrayList<>();
+
+        Resources r = getResources();
+        float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, r.getDisplayMetrics());
         meshPaint = new Paint();
-        meshPaint.setStrokeWidth(5);
+        meshPaint.setStrokeWidth(strokeWidth);
         meshPaint.setStyle(Paint.Style.STROKE);
         meshPaint.setColor(meshColor);
 
