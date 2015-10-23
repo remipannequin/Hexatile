@@ -231,7 +231,8 @@ public class Board implements Parcelable {
             selected.mutate();
             int level = selected.getLevel();
             dirty = true;
-            stat.recordPutTile(selected.getLevel());//TODO record mutations specifically
+
+            stat.recordMutateTile(selected.getKind());//TODO record mutations specifically
             boolean collapsing = willCollapse(selected);
             for (BoardEventListener l : listeners) {
                 l.onTileMutated(selected, collapsing, level);

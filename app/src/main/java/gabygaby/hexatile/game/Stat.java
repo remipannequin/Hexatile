@@ -11,11 +11,13 @@ public class Stat {
     private int[] scoreByLevel;
     private int[] scoreEventCount;
     private int[] tilesAdded;
+    private int[] tileMutated;
 
     public Stat() {
         this.scoreEventCount = new int[6];
         this.scoreByLevel = new int[6];
         this.tilesAdded = new int[7];
+        this.tileMutated = new int[3];
     }
 
     public void recordScore(int level, int reward) {
@@ -26,5 +28,13 @@ public class Stat {
 
     public void recordPutTile(int level) {
         tilesAdded[level]++;
+    }
+
+    /**
+     * Record that a tile was mutated
+     * @param kind at least 2, since only tile above kind 1 can mutate
+     */
+    public void recordMutateTile(int kind) {
+        tileMutated[kind-2]++;
     }
 }
