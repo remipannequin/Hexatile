@@ -12,7 +12,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
 import gabygaby.hexatile.GameActivity;
-import gabygaby.hexatile.MainActivity;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
 
@@ -57,7 +56,7 @@ public class GamePersist implements Board.BoardEventListener {
     public void init(Context ctx) {
         context = ctx;
 
-        FileInputStream fis = null;
+        FileInputStream fis;
         try {
             fis = context.openFileInput(FILENAME_HIGHSCORE);
 
@@ -214,6 +213,11 @@ public class GamePersist implements Board.BoardEventListener {
             board = null;
             write_score();
         }
+    }
+
+    @Override
+    public void onTileMutated(Tile selected, boolean collapsing) {
+
     }
 
     public Board getBoard() {

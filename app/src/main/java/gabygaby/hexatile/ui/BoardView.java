@@ -377,6 +377,11 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
     }
 
+    @Override
+    public void onTileMutated(Tile selected, boolean collapsing) {
+        //TODO
+    }
+
     /**
      * Invalidate all the child tiles. Usefull when setting the board
      */
