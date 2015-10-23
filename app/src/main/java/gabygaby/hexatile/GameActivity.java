@@ -2,6 +2,9 @@ package gabygaby.hexatile;
 
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     public static final String TAG = "hexatil.GameActivity"; //NON-NLS
 
     private Board board;
+    private BoardView boardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         if (bar != null) {
             bar.setDisplayHomeAsUpEnabled(true);
         }
-        final BoardView boardView = (BoardView) findViewById(R.id.board_view);
+        boardView = (BoardView) findViewById(R.id.board_view);
 
 
 
@@ -62,8 +66,26 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
+    }
 
-
+    /**
+     * Restart the game
+     */
+    private void restart() {
+        board = new Board(5, 6);
+        GamePersist gp = GamePersist.getInstance();
+            if (!gp.isInitialized()) {
+                gp.init(getApplicationContext());
+            }
+        gp.startGame(board);
+        board.addListener(this);
+        boardView.setBoard(board);
+        boardView.invalidateAll();
+        updateScore();
+        TileGenerator generator = new TileGenerator(5);
+        TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
+        generatorView.setGenerator(generator);
+        boardView.setGenerator(generator);
     }
 
     @Override
@@ -83,13 +105,33 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     }
 
     public void gameOver() {
-        //TODO: show statistics in a dialog
-
+        GamePersist gp = GamePersist.getInstance();
+        if (!gp.isInitialized()) {
+            gp.init(getApplicationContext());
+        }
+        gp.finishGame();
         GoogleApiClient apiClient = getApiClient();
         if (apiClient != null && apiClient.isConnected()) {
             //publish score
             Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic), board.getScore());
         }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(R.string.game_over);
+        //builder.setMessage("");
+        builder.setPositiveButton(getString(R.string.new_game), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                restart();
+            }
+        });
+        builder.setNegativeButton(R.string.quit, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     public void updateScore() {

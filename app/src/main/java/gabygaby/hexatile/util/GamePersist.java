@@ -182,6 +182,14 @@ public class GamePersist implements Board.BoardEventListener {
         board.addListener(this);
     }
 
+    public void finishGame() {
+        int score = board.getScore();
+        if (highScore < score) {
+            highScore = score;
+        }
+        board = null;
+        write_score();
+    }
 
     @Override
     public void onTileAdded(Tile newTile, boolean collapsing, int origLevel) {
@@ -207,12 +215,7 @@ public class GamePersist implements Board.BoardEventListener {
 
     @Override
     public void onGameOver() {
-        int score = board.getScore();
-        if (highScore < score) {
-            highScore = score;
-            board = null;
-            write_score();
-        }
+
     }
 
     @Override
