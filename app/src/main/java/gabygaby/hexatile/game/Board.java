@@ -32,7 +32,7 @@ public class Board implements Parcelable {
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        stat = new Stat();
+        stat = new Stat(width*height);
         score = 0;
         tiles = new Tile[height * width];
         listeners = new ArrayList<>();
@@ -275,12 +275,23 @@ public class Board implements Parcelable {
                 }
             }
         }
+        stat.recordOccupation(getOccupation());
         if (isGameOver()) {
             for (BoardEventListener l : listeners) {
                 l.onGameOver();
             }
         }
 
+    }
+
+    private int getOccupation() {
+        int result = 0;
+        for (Tile t: tiles) {
+            if (!t.isFree()) {
+                result++;
+            }
+        }
+        return result;
     }
 
 

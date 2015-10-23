@@ -1,6 +1,8 @@
 package gabygaby.hexatile.game;
 
 
+import java.util.List;
+
 /**
  * Class to store statistics about a game
  *
@@ -8,12 +10,15 @@ package gabygaby.hexatile.game;
  */
 public class Stat {
 
+    private final int boardSize;
     private int[] scoreByLevel;
     private int[] scoreEventCount;
     private int[] tilesAdded;
+    private List<Float> boardOccupation;
     private int[] tileMutated;
 
-    public Stat() {
+    public Stat(int boardSize) {
+        this.boardSize = boardSize;
         this.scoreEventCount = new int[6];
         this.scoreByLevel = new int[6];
         this.tilesAdded = new int[7];
@@ -37,4 +42,9 @@ public class Stat {
     public void recordMutateTile(int kind) {
         tileMutated[kind-2]++;
     }
+
+    public void recordOccupation(int numberOfTiles) {
+        boardOccupation.add((float)numberOfTiles / (float)boardSize);
+    }
+
 }
