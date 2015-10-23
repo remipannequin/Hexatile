@@ -231,7 +231,8 @@ public class Board implements Parcelable {
             selected.mutate();
             int level = selected.getLevel();
             dirty = true;
-
+            int reward = (int) Math.pow(level, level);
+            score += reward;
             stat.recordMutateTile(selected.getKind());//TODO record mutations specifically
             boolean collapsing = willCollapse(selected);
             for (BoardEventListener l : listeners) {
