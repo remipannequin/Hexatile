@@ -145,11 +145,9 @@ public class Board implements Parcelable {
      */
     public boolean isGameOver() {
         for (Tile t : tiles) {
-
-            if (t.isFree()) {
+            if (t.isFree() || t.isMutable()) {
                 return false;
             }
-
         }
         return true;
     }
