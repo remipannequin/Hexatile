@@ -1,6 +1,7 @@
 package gabygaby.hexatile.game;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -23,6 +24,7 @@ public class Stat {
         this.scoreByLevel = new int[6];
         this.tilesAdded = new int[7];
         this.tileMutated = new int[3];
+        this.boardOccupation = new ArrayList<>();
     }
 
     public void recordScore(int level, int reward) {
