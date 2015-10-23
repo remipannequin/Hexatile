@@ -10,6 +10,8 @@ import java.util.Set;
  */
 public class Tile {
 
+    public static final int MAX_TILE_LEVEL = 8;
+
     private Tile right, left, up_left, up_right, down_left, down_right;
     private int level;
     private int index;
@@ -26,7 +28,7 @@ public class Tile {
     }
 
     public void setLevel(int level) {
-        this.level = Math.min(level, 8);
+        this.level = Math.min(level, MAX_TILE_LEVEL);
     }
 
 
