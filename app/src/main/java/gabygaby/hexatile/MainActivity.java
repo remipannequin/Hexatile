@@ -69,6 +69,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         bestTile.syncDrawnLevel();
         if (gp.hasUnfinishedGame()) {
             newGameButton.setText(R.string.button_resume_game);
+        } else {
+            newGameButton.setText(R.string.new_game);
         }
     }
 

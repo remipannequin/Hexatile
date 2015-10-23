@@ -116,15 +116,15 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
             Games.Leaderboards.submitScore(apiClient, getString(R.string.leaderboard_classic), board.getScore());
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Game Over");
+        builder.setTitle(R.string.game_over);
         //builder.setMessage("");
-        builder.setPositiveButton("New Game", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton(getString(R.string.new_game), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 restart();
             }
         });
-        builder.setNegativeButton("Quit", new DialogInterface.OnClickListener() {
+        builder.setNegativeButton(R.string.quit, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();

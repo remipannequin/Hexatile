@@ -6,4 +6,6 @@
     <string name="button_resume_game">Resume Game</string>
     <string name="best_score">Best score</string>
     <string name="new_game">New Game</string>
+    <string name="quit">Quit</string>
+    <string name="game_over">Game Over</string>
 </resources>
