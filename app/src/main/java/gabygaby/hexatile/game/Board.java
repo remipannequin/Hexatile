@@ -231,11 +231,12 @@ public class Board implements Parcelable {
     public void mutate(Tile selected) {
         if (selected.isMutable()) {
             selected.mutate();
+            int level = selected.getLevel();
             dirty = true;
             stat.recordPutTile(selected.getLevel());//TODO record mutations specifically
             boolean collapsing = willCollapse(selected);
             for (BoardEventListener l : listeners) {
-                l.onTileMutated(selected, collapsing);
+                l.onTileMutated(selected, collapsing, level);
             }
 
             clean(selected, collapsing);
@@ -256,9 +257,9 @@ public class Board implements Parcelable {
     /**
      * Collapse groups if needed until no collapse happen
      * @param selected the tile to check for collapsing
-     * @param collapsing
+     * @param willCollapse
      */
-    private void clean(Tile selected, boolean collapsing) {
+    private void clean(Tile selected, boolean willCollapse) {
         while (isDirty()) {
             Set<Tile> group = compute(selected);
 
@@ -267,7 +268,7 @@ public class Board implements Parcelable {
                     l.onGroupCollapsed(group, selected);
                 }
             } else {
-                if (willCollapse(selected)) {
+                if (willCollapse) {
                     for (BoardEventListener l : listeners) {
                         l.onCascadeFinished();
                     }
@@ -319,6 +320,6 @@ public class Board implements Parcelable {
          */
         void onGameOver();
 
-        void onTileMutated(Tile selected, boolean collapsing);
+        void onTileMutated(Tile selected, boolean collapsing, int origLevel);
     }
 }

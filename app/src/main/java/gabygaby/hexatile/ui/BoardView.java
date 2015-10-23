@@ -19,6 +19,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.CycleInterpolator;
 
@@ -195,10 +196,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
         if (selected != null) {
             //mutate the tile if possible
             if (selected.isMutable()) {
-                selected.mutate();
-                TileView view = (TileView) getChildAt(selected.getIndex());
-                view.syncDrawnLevel();
-                view.invalidate();
+                board.mutate(selected);
+                //TileView view = (TileView) getChildAt(selected.getIndex());
+                //view.syncDrawnLevel();
+                //view.invalidate();
             }
         }
     }
@@ -378,8 +379,46 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     }
 
     @Override
-    public void onTileMutated(Tile selected, boolean collapsing) {
-        //TODO
+    public void onTileMutated(Tile mutatedTile, boolean collapsing, final int origLevel) {
+
+        final TileView view = (TileView) getChildAt(mutatedTile.getIndex());
+        ObjectAnimator shrinkInAnim = ObjectAnimator.ofFloat(view, "scale", 1, 0, 1); //NON-NLS
+        shrinkInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                if (animation.getAnimatedFraction() < 0.1) {
+                    view.syncDrawnLevel();
+                    view.setDrawnLevel(origLevel);
+                    view.invalidate();
+                }
+            }
+        });
+        /*
+        shrinkInAnim.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                view.syncDrawnLevel();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });*/
+        shrinkInAnim.setDuration(500);
+        shrinkInAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+        if (collapsing) {
+            collapseAnimator.reset(shrinkInAnim);
+        } else {
+            shrinkInAnim.start();
+        }
     }
 
     /**

@@ -142,7 +142,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     }
 
     @Override
-    public void onTileMutated(Tile selected, boolean collapsing) {
+    public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
 
     }
 

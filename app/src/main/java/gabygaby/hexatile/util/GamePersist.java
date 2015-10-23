@@ -216,8 +216,7 @@ public class GamePersist implements Board.BoardEventListener {
     }
 
     @Override
-    public void onTileMutated(Tile selected, boolean collapsing) {
-
+    public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
     }
 
     public Board getBoard() {
