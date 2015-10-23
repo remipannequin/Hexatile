@@ -7,9 +7,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
+import gabygaby.hexatile.GameActivity;
 import gabygaby.hexatile.MainActivity;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -47,6 +49,9 @@ public class GamePersist implements Board.BoardEventListener {
     }
 
     private GamePersist() {
+        //sane values
+        highScore = 0;
+        bestTile = 1;
     }
 
     public void init(Context ctx) {
@@ -79,15 +84,22 @@ public class GamePersist implements Board.BoardEventListener {
             Tile[] tiles = board.getTiles();
             for (Tile t: tiles) {
                 short level = buffer.getShort();
+                short kind = buffer.getShort();
+                int value = buffer.getInt();
                 t.setLevel(level);
+                t.setKind(kind);
+                t.setValue(value);
             }
             board.addListener(this);
             fis.close();
 
         } catch (FileNotFoundException e) {
             //Can happen on the first exec
-            highScore = 0;
-            bestTile = 1;
+            board = null;
+        } catch ( BufferUnderflowException e) {
+            // file may be corrupted (too short)
+            Log.w(GameActivity.TAG, "error while loading save file");
+            context.deleteFile(FILENAME_CURRENT);
             board = null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -123,13 +135,21 @@ public class GamePersist implements Board.BoardEventListener {
             try {
                 fos = context.openFileOutput(FILENAME_CURRENT, Context.MODE_PRIVATE);
 
-                ByteBuffer buffer = ByteBuffer.allocate((Integer.SIZE * 3 + Short.SIZE * w * h) / Byte.SIZE);
+                ByteBuffer buffer = ByteBuffer.allocate(
+                        (Integer.SIZE * 3 + //score, width, height
+                                (Short.SIZE * 2 + Integer.SIZE) //level, kind, value...
+                                        * w * h) // ...for each tile
+                                / Byte.SIZE);
                 buffer.putInt(s);
                 buffer.putInt(w);
                 buffer.putInt(h);
                 for (Tile t : tiles) {
                     short level = (short) t.getLevel();
+                    short kind = (short) t.getKind();
+                    int value = t.getValue();
                     buffer.putShort(level);
+                    buffer.putShort(kind);
+                    buffer.putInt(value);
                 }
                 fos.write(buffer.array());
                 fos.close();

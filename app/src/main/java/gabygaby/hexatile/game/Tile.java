@@ -191,4 +191,16 @@ public class Tile {
     public int getKind() {
         return kind;
     }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setKind(int kind) {
+        this.kind = kind;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
 }
