@@ -292,6 +292,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     }
 
     public void setBoard(Board board) {
+        removeAllViews();
         this.board = board;
         int i = 0;
         for (Tile t : board.getTiles()) {

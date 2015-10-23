@@ -78,13 +78,12 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         gp.startGame(board);
         board.addListener(this);
         boardView.setBoard(board);
-        boardView.invalidateAll();
         updateScore();
         TileGenerator generator = new TileGenerator(5);
         TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
-
+        boardView.invalidateAll();
     }
 
     @Override
@@ -97,7 +96,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
     }
-
+    
     public void gameOver() {
         GamePersist gp = GamePersist.getInstance();
         if (!gp.isInitialized()) {
@@ -175,11 +174,6 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     @Override
     public void onGameOver() {
         gameOver();
-    }
-
-    @Override
-    public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
-        updateScore();
     }
 
     @Override
