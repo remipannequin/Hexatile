@@ -116,10 +116,9 @@ public class Board implements Parcelable {
         if (group.size() >= THRESHOLD) {
             for (Tile t : group) {
                 t.consume();
-
             }
             last.promote();
-            int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
+            int reward = Score.collapse(last, group);
             stat.recordScore(last.getLevel(), reward);
             score += reward;
             dirty = true;
