@@ -122,7 +122,7 @@ public class Board implements Parcelable {
                 group_value += t.consume();
             }
             last.promote(group_value);
-            int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
+            int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel() + (last.getKind() - 1) * 2);
             stat.recordScore(last.getLevel(), reward);
             score += reward;
             dirty = true;
