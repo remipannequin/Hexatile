@@ -129,7 +129,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
 
     public void updateScore() {
         final TextView scoreView = (TextView) findViewById(R.id.scoreTextView);
-        scoreView.setText(String.format("%d", board.getScore())); //NON-NLS
+        scoreView.setText(String.format("%,d", board.getScore())); //NON-NLS
     }
 
     @Override

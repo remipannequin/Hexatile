@@ -90,14 +90,13 @@ public class Tile {
      */
     public void mutate() {
         kind++;
-        level--;
     }
 
     /**
      *
      */
     public boolean isMutable() {
-        if (level < 2) {
+        if (level < 2 || kind >= 4) {
             return false;
         }
         int limit = (int)Math.pow(5, kind) * (int)Math.pow(4, level - kind - 1);
