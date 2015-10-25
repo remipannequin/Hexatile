@@ -224,7 +224,7 @@ public class Board implements Parcelable {
             selected.mutate();
             int level = selected.getLevel();
             dirty = true;
-            int reward = (int) Math.pow(level, level);
+            int reward = Score.mutate(selected);
             score += reward;
             stat.recordMutateTile(selected.getKind());//TODO record mutations specifically
             boolean collapsing = willCollapse(selected);
@@ -237,6 +237,8 @@ public class Board implements Parcelable {
             Log.w(GameActivity.TAG, "selected tile was not mutable");
         }
     }
+
+
 
     /**
      * Return true if a collapse event will happen
