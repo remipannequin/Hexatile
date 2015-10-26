@@ -25,13 +25,13 @@ public class Score {
         int reward = 1;
         int size = group.size();
         int level = last.getLevel();
-        if (size > Board.THRESHOLD) {
+        if (size > (Board.THRESHOLD + 1)) {
             reward *= 2;
         }
-        if (size > 9) {
+        if (size >= 9) {
             reward *= 2;
         }
-        reward *= Math.pow(2, level - 1);
+        reward *= Math.pow(2, level - 2);
         return reward;
     }
 
