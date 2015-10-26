@@ -2,6 +2,7 @@ package gabygaby.hexatile.ui;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -13,6 +14,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.DecelerateInterpolator;
 
@@ -25,6 +27,8 @@ import gabygaby.hexatile.game.TileGenerator;
  */
 public class TileGeneratorView extends ViewGroup implements TileGenerator.GeneratorListener {
 
+    public static final int CONSUME_ANIM_DURATION = 200;
+    public static final int FLIP_ANIM_DURATION = 500;
     private int meshColor = Color.GRAY;
 
     private int tileHeight, tileWidth = 0;
@@ -34,6 +38,8 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     private Tile[] tiles;
     private ObjectAnimator futureAnim;
     private ObjectAnimator stashAnim;
+    private float[] positions;
+    private float[] scales;
 
 
     public TileGeneratorView(Context context) {
@@ -99,11 +105,13 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-
+        positions = new float[generator.getSize()];
+        scales = new float[generator.getSize()];
         float x = 0.66f * getWidth();
         float t = 0.25f * tileHeight;
         for (int j = 0; j < generator.getSize(); j++) {
-            float h = x / (0.66f * getWidth()) * tileHeight;
+            float scale = x / (0.66f * getWidth());
+            float h = scale * tileHeight;
             float w = h * BoardView.COS;
             float p = x - 1.5f * w;
             TileView v = (TileView) getChildAt(j);
@@ -112,7 +120,10 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             int child_width = MeasureSpec.makeMeasureSpec(Math.round(w), MeasureSpec.EXACTLY);
 
             v.measure(child_width, child_height);
+            v.setPivotTopLeft();
             v.layout(Math.round(p), Math.round(t), Math.round(p + w), Math.round(t + h));
+            positions[j] = p;
+            scales[j] = scale;
             x = p;
         }
 
@@ -157,11 +168,11 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             i++;
         }
         final TileView last = (TileView) getChildAt(0);
-        futureAnim = ObjectAnimator.ofFloat(getChildAt(0), "flip", 0, 1); //NON-NLS
-        futureAnim.setDuration(500);
+        futureAnim = ObjectAnimator.ofFloat(getChildAt(0), "flip", 1, 0); //NON-NLS
+        futureAnim.setDuration(FLIP_ANIM_DURATION);
         futureAnim.setRepeatMode(Animation.REVERSE);
         futureAnim.setRepeatCount(Animation.INFINITE);
-        futureAnim.setInterpolator(new DecelerateInterpolator());
+        futureAnim.setInterpolator(new AccelerateInterpolator());
         futureAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
@@ -187,7 +198,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
         generator.addListener(this);
 
         stashAnim = ObjectAnimator.ofFloat(stashView, "flip", 0, 1); //NON-NLS
-        stashAnim.setDuration(500);
+        stashAnim.setDuration(FLIP_ANIM_DURATION);
         stashAnim.setRepeatMode(Animation.REVERSE);
         stashAnim.setRepeatCount(Animation.INFINITE);
         stashAnim.setInterpolator(new DecelerateInterpolator());
@@ -209,15 +220,90 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
     @Override
     public void onTileConsumed() {
-        int i = 0;
-        for (int v : generator.peekFutures()) {
-            TileView child = (TileView) getChildAt(i);
-            Tile t = tiles[i];
+
+        //animate futures
+        final TileView last = (TileView) getChildAt(0);
+        AnimatorSet animSet = new AnimatorSet();
+        //hide the last tile from view,
+        futureAnim.cancel();
+        last.setVisibility(GONE);
+        tiles[0].setLevel(generator.peekFutures().get(0));
+        last.syncDrawnLevel();
+        last.invalidate();
+        //create animations for the other tiles
+        for (int i = 1; i < generator.getSize(); i++) {
+            final Tile t = tiles[i];
+            final TileView tileView = (TileView) getChildAt(i);
+            final int v = generator.peekFutures().get(i);
+            //translationX
+            float deltaX = positions[i - 1] - positions[i];
+            ObjectAnimator a1 = ObjectAnimator.ofFloat(tileView, "translationX", 0, deltaX);
+            a1.setDuration(CONSUME_ANIM_DURATION);
+            //scaleX and Y
+            float scale = scales[i - 1] / scales[i];
+            ObjectAnimator a2 = ObjectAnimator.ofFloat(tileView, "scaleX", 1, scale);
+            a2.setDuration(CONSUME_ANIM_DURATION);
+            ObjectAnimator a3 = ObjectAnimator.ofFloat(tileView, "scaleY", 1, scale);
+            a3.setDuration(CONSUME_ANIM_DURATION);
+            a1.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animation) {
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animation) {
+                    tileView.setTranslationX(0);
+                    tileView.setScaleX(1);
+                    tileView.setScaleY(1);
+                    t.setLevel(v);
+                    tileView.syncDrawnLevel();
+                    tileView.invalidate();
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animation) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animation) {
+                }
+            });
+            //play all them together
+            animSet.playTogether(a1, a2, a3);
+            //on end, update views, reset positions, unhide last tile
+        }
+        animSet.start();
+        animSet.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                last.setVisibility(VISIBLE);
+                futureAnim.start();
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+
+
+
+       /*
+
             t.setLevel(v);
             child.syncDrawnLevel();
             child.invalidate();
-            i++;
+
         }
+        */
     }
 
 

@@ -169,6 +169,11 @@ public class TileView extends View {
         setPivotY(height/2f);
     }
 
+    public void setPivotTopLeft() {
+        setPivotX(0);
+        setPivotY(0);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
