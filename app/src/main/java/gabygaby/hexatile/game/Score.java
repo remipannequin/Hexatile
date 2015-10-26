@@ -32,7 +32,7 @@ public class Score {
         if (size >= 9) {
             reward *= 2;
         }
-        reward *= Math.pow(2, level - 1);
+        reward *= Math.pow(2, level - 2);
         reward *= Math.pow(2, kind - 1);
 
         return reward;
