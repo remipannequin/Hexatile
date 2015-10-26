@@ -17,9 +17,9 @@ public class TileGenerator {
 
     private int size;
     private Queue<Integer> futures;
-    private int reserve;
+    private int stash;
     private Collection<GeneratorListener> listeners;
-    private boolean reserveSelected = false;
+    private boolean stashSelected = false;
 
     public TileGenerator(int bufferSize) {
         size = bufferSize;
@@ -59,31 +59,31 @@ public class TileGenerator {
     }
 
     /**
-     * @return the content of the reserve
+     * @return the content of the stash
      */
-    public int peekReserve() {
-        return reserve;
+    public int peekStash() {
+        return stash;
     }
 
     /**
      * Get the tile value (level) either from the nomral source,
-     * or the tile stored in the reserve, depending on the source selected
+     * or the tile stored in the stash, depending on the source selected
      * <p/>
      * <p/>
      * Get the last tile and update future tiles
-     * Get the Tile from the reserve, and empty the reserve
+     * Get the Tile from the stash, and empty the stash
      *
      * @return the tile's level generated from the selected source
      */
     public int consume() {
         int v;
-        if (reserveSelected) {
-            v = reserve;
-            reserve = 0;
+        if (stashSelected) {
+            v = stash;
+            stash = 0;
             for (GeneratorListener l : listeners) {
-                l.onReserveChanged();
+                l.onStashChanged();
             }
-            selectReserve(false);
+            selectStash(false);
         } else {
             v = futures.poll();
             futures.add(generate());
@@ -95,28 +95,28 @@ public class TileGenerator {
     }
 
     /**
-     * Put the available tile to the reserve
+     * Put the available tile to the stash
      */
-    public void toReserve() {
-        if (isReserveFree()) {
-            reserve = consume();
+    public void stash() {
+        if (isStashPlaceFree()) {
+            stash = consume();
             for (GeneratorListener l : listeners) {
                 l.onTileConsumed();
-                l.onReserveChanged();
+                l.onStashChanged();
             }
         } else {
-            Log.w(GameActivity.TAG, "trying to move a tile to the reserve, but it is not free"); //NON-NLS
+            Log.w(GameActivity.TAG, "trying to move a tile to the stash, but it is not free"); //NON-NLS
         }
     }
 
 
     /**
-     * check if the reserve is occupied
+     * check if the stash is occupied
      *
-     * @return true if the reserve contains a tile
+     * @return true if the stash contains a tile
      */
-    public boolean isReserveFree() {
-        return (reserve == 0);
+    public boolean isStashPlaceFree() {
+        return (stash == 0);
     }
 
     public void addListener(GeneratorListener l) {
@@ -135,19 +135,19 @@ public class TileGenerator {
         return size;
     }
 
-    public void selectReserve(boolean b) {
-        reserveSelected = b;
+    public void selectStash(boolean b) {
+        stashSelected = b;
         for(GeneratorListener l :listeners) {
-            l.onSourceChanged(reserveSelected);
+            l.onSourceChanged(stashSelected);
         }
     }
 
     public interface GeneratorListener {
         void onTileConsumed();
 
-        void onReserveChanged();
+        void onStashChanged();
 
-        void onSourceChanged(boolean fromReserve);
+        void onSourceChanged(boolean fromStash);
     }
 
 }
