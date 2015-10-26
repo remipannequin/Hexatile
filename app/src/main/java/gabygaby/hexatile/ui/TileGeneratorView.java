@@ -33,7 +33,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     private GestureDetector gestureDetector;
     private Tile[] tiles;
     private ObjectAnimator futureAnim;
-    private ObjectAnimator reserveAnim;
+    private ObjectAnimator stashAnim;
 
 
     public TileGeneratorView(Context context) {
@@ -77,7 +77,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
         // In edit mode it'animatorSet nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             TileGenerator g = new TileGenerator(4);
-            g.toReserve();
+            g.stash();
             setGenerator(g);
         }
     }
@@ -177,31 +177,31 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
         });
         futureAnim.start();
 
-        int v = generator.peekReserve();
+        int v = generator.peekStash();
         Tile t = new Tile(i, v);
-        final TileView reserveView = new TileView(getContext());
-        reserveView.setTile(t);
-        reserveView.syncDrawnLevel();
-        this.addView(reserveView, i);
+        final TileView stashView = new TileView(getContext());
+        stashView.setTile(t);
+        stashView.syncDrawnLevel();
+        this.addView(stashView, i);
         tiles[i] = t;
         generator.addListener(this);
 
-        reserveAnim = ObjectAnimator.ofFloat(reserveView, "flip", 0, 1); //NON-NLS
-        reserveAnim.setDuration(500);
-        reserveAnim.setRepeatMode(Animation.REVERSE);
-        reserveAnim.setRepeatCount(Animation.INFINITE);
-        reserveAnim.setInterpolator(new DecelerateInterpolator());
-        reserveAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        stashAnim = ObjectAnimator.ofFloat(stashView, "flip", 0, 1); //NON-NLS
+        stashAnim.setDuration(500);
+        stashAnim.setRepeatMode(Animation.REVERSE);
+        stashAnim.setRepeatCount(Animation.INFINITE);
+        stashAnim.setInterpolator(new DecelerateInterpolator());
+        stashAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                reserveView.invalidate();
+                stashView.invalidate();
             }
         });
-        reserveAnim.addPauseListener(new AnimatorListenerAdapter() {
+        stashAnim.addPauseListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationPause(Animator animation) {
-                reserveView.setFlip(1);
-                reserveView.invalidate();
+                stashView.setFlip(1);
+                stashView.invalidate();
             }
         });
     }
@@ -222,11 +222,11 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
 
     @Override
-    public void onReserveChanged() {
+    public void onStashChanged() {
         int i = generator.getSize();
         TileView child = (TileView) getChildAt(i);
         Tile t = tiles[i];
-        t.setLevel(generator.peekReserve());
+        t.setLevel(generator.peekStash());
         child.syncDrawnLevel();
         child.invalidate();
     }
@@ -234,13 +234,13 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
     @Override
     public void onSourceChanged(boolean fromReserve) {
         if (fromReserve) {
-            //stop reserve animation
-            reserveAnim.start();
+            //stop stash animation
+            stashAnim.start();
             //start future animation
             futureAnim.pause();
         } else {
-            //stop reserve animation
-            reserveAnim.pause();
+            //stop stash animation
+            stashAnim.pause();
             //start future animation
             futureAnim.start();
         }
@@ -249,17 +249,17 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
     private void selectReserve(boolean b) {
         if (b) {
-            if (generator.isReserveFree()) {
-                //send tile to reserve
-                //don't select reserve
-                generator.toReserve();
+            if (generator.isStashPlaceFree()) {
+                //send tile to stash
+                //don't select stash
+                generator.stash();
             } else {
-                //select reserve
-                generator.selectReserve(true);
+                //select stash
+                generator.selectStash(true);
             }
         } else {
             //select futures
-            generator.selectReserve(false);
+            generator.selectStash(false);
         }
     }
 
