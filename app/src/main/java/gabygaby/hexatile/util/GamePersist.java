@@ -79,6 +79,9 @@ public class GamePersist implements Board.BoardEventListener {
             Tile[] tiles = board.getTiles();
             for (Tile t: tiles) {
                 short level = buffer.getShort();
+                //for future use
+                short kind = buffer.getShort();
+                int value = buffer.getInt();
                 t.setLevel(level);
             }
             board.addListener(this);
@@ -123,13 +126,18 @@ public class GamePersist implements Board.BoardEventListener {
             try {
                 fos = context.openFileOutput(FILENAME_CURRENT, Context.MODE_PRIVATE);
 
-                ByteBuffer buffer = ByteBuffer.allocate((Integer.SIZE * 3 + Short.SIZE * w * h) / Byte.SIZE);
+                ByteBuffer buffer = ByteBuffer.allocate((Integer.SIZE * 3 +
+                        (Short.SIZE * 2 + Integer.SIZE) * w * h)
+                        / Byte.SIZE);
                 buffer.putInt(s);
                 buffer.putInt(w);
                 buffer.putInt(h);
                 for (Tile t : tiles) {
                     short level = (short) t.getLevel();
                     buffer.putShort(level);
+                    //useful for future format
+                    buffer.putShort((short) 0);
+                    buffer.putInt(0);
                 }
                 fos.write(buffer.array());
                 fos.close();
@@ -162,6 +170,14 @@ public class GamePersist implements Board.BoardEventListener {
         board.addListener(this);
     }
 
+    public void finishGame() {
+        int score = board.getScore();
+        if (highScore < score) {
+            highScore = score;
+        }
+        board = null;
+        write_score();
+    }
 
     @Override
     public void onTileAdded(Tile newTile, boolean collapsing, int origLevel) {
@@ -187,12 +203,7 @@ public class GamePersist implements Board.BoardEventListener {
 
     @Override
     public void onGameOver() {
-        int score = board.getScore();
-        if (highScore < score) {
-            highScore = score;
-            board = null;
-            write_score();
-        }
+
     }
 
     public Board getBoard() {

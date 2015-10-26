@@ -116,10 +116,9 @@ public class Board implements Parcelable {
         if (group.size() >= THRESHOLD) {
             for (Tile t : group) {
                 t.consume();
-
             }
             last.promote();
-            int reward = (int) Math.pow((last.getLevel() + group.size() - THRESHOLD), last.getLevel());
+            int reward = Score.collapse(last, group);
             stat.recordScore(last.getLevel(), reward);
             score += reward;
             dirty = true;
@@ -151,15 +150,6 @@ public class Board implements Parcelable {
         return true;
     }
 
-    /**
-     * Reset the game
-     */
-    public void reset() {
-        for (Tile t : tiles) {
-            t.consume();
-        }
-        score = 0;
-    }
 
     public boolean isDirty() {
         return dirty;
@@ -177,6 +167,8 @@ public class Board implements Parcelable {
         dest.writeInt(height);
 
         int[] levels = new int[width * height];
+
+
         int i = 0;
         for (Tile t : tiles) {
 
