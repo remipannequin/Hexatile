@@ -381,28 +381,24 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
     @Override
     public void onTileMutated(Tile mutatedTile, boolean collapsing, final int origLevel) {
-
+        AnimatorSet s = new AnimatorSet();
         final TileView view = (TileView) getChildAt(mutatedTile.getIndex());
-        ObjectAnimator shrinkInAnim = ObjectAnimator.ofFloat(view, "scale", 1, 0, 1); //NON-NLS
-        shrinkInAnim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (animation.getAnimatedFraction() < 0.1) {
-                    view.syncDrawnLevel();
-                    view.setDrawnLevel(origLevel);
-                    view.invalidate();
-                }
-            }
-        });
-        /*
-        shrinkInAnim.addListener(new Animator.AnimatorListener() {
+        ObjectAnimator shrinkInAnimX = ObjectAnimator.ofFloat(view, "scaleX", 1, 0.1f); //NON-NLS
+        ObjectAnimator shrinkInAnimY = ObjectAnimator.ofFloat(view, "scaleY", 1, 0.1f); //NON-NLS
+        ObjectAnimator shrinkOutAnimX = ObjectAnimator.ofFloat(view, "scaleX", 0.1f, 1); //NON-NLS
+        ObjectAnimator shrinkOutAnimY = ObjectAnimator.ofFloat(view, "scaleY", 0.1f, 1); //NON-NLS
+
+        shrinkOutAnimX.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
                 view.syncDrawnLevel();
+                view.setDrawnLevel(origLevel);
+                view.invalidate();
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
+
             }
 
             @Override
@@ -412,13 +408,24 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
             @Override
             public void onAnimationRepeat(Animator animation) {
             }
-        });*/
-        shrinkInAnim.setDuration(500);
-        shrinkInAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+        });
+
+        shrinkInAnimX.setDuration(250);
+        shrinkInAnimX.setDuration(250);
+        shrinkInAnimX.setInterpolator(new AccelerateInterpolator());
+        shrinkInAnimY.setInterpolator(new AccelerateInterpolator());
+        shrinkOutAnimX.setDuration(250);
+        shrinkOutAnimX.setDuration(250);
+        shrinkOutAnimX.setInterpolator(new AccelerateInterpolator());
+        shrinkOutAnimY.setInterpolator(new AccelerateInterpolator());
+        s.play(shrinkInAnimX).with(shrinkInAnimY);
+        s.play(shrinkOutAnimX).with(shrinkOutAnimY);
+        s.play(shrinkOutAnimX).after(shrinkInAnimX);
+
         if (collapsing) {
-            collapseAnimator.reset(shrinkInAnim);
+            collapseAnimator.reset(s);
         } else {
-            shrinkInAnim.start();
+            s.start();
         }
     }
 
