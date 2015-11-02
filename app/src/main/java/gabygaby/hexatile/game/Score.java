@@ -64,7 +64,7 @@ public class Score {
      * @return the limit to be mutable, or maxvalue, if the level or kind does not enable mutation
      */
     public static int limit(int level,int kind) {
-        if (kind >= 4 || level <= kind) {
+        if (kind >= Tile.MAX_TILE_KIND || level <= kind) {
             return Integer.MAX_VALUE;
         }
         return (int)(Math.pow(Board.THRESHOLD + 1, level - kind) * Math.pow(Board.THRESHOLD + 2, kind));

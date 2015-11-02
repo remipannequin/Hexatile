@@ -69,7 +69,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
                 int k = t.getKind();
                 if (l >= (Tile.MAX_TILE_LEVEL-1)) {
                     t.setLevel(1);
-                    t.setKind((k % 4) + 1);
+                    t.setKind((k % Tile.MAX_TILE_KIND) + 1);
                 } else {
                     t.setLevel(l + 1);
                 }
