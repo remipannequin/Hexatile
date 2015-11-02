@@ -15,10 +15,10 @@ import gabygaby.hexatile.GameActivity;
  */
 public class TileGenerator {
 
-    private int size;
-    private Queue<Integer> futures;
+    private final int size;
+    private final Queue<Integer> futures;
     private int stash;
-    private Collection<GeneratorListener> listeners;
+    private final Collection<GeneratorListener> listeners;
     private boolean stashSelected = false;
 
     public TileGenerator(int bufferSize) {

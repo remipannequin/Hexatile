@@ -11,6 +11,7 @@ import java.util.Set;
 public class Tile {
     
     public static final int MAX_TILE_LEVEL = 8;
+    public static final int MAX_TILE_KIND = 4;
 
     /**
      * neighbours
@@ -35,8 +36,8 @@ public class Tile {
 
     /**
      * CReate a new tile. If level is not zero, the kind is the first (vegetal)
-     * @param index
-     * @param level
+     * @param index the index of the new tile in the board (if any)
+     * @param level the level of the new tile
      */
     public Tile(int index, int level) {
         this.level = level;

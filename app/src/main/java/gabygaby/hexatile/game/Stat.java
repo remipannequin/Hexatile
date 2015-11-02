@@ -1,11 +1,8 @@
 package gabygaby.hexatile.game;
 
 
-import android.util.Log;
 
 import java.security.InvalidParameterException;
-
-import gabygaby.hexatile.GameActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +15,11 @@ import java.util.List;
 public class Stat {
 
     private final int boardSize;
-    private int[] scoreByLevel;
-    private int[] scoreEventCount;
-    private int[] tilesAdded;
-    private List<Float> boardOccupation;
-    private int[] tileMutated;
+    private final int[] scoreByLevel;
+    private final int[] scoreEventCount;
+    private final int[] tilesAdded;
+    private final List<Float> boardOccupation;
+    private final int[] tileMutated;
 
     
         
