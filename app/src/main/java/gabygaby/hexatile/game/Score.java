@@ -54,4 +54,20 @@ public class Score {
         return reward;
     }
 
+    /**
+     * Compute the mutation limit for a tile.
+     * A tile is mutable if it level is strictly superior than its kind (i.e. tile of kind = 1 are
+     * mutable stating at level 2) and if a superior kind exists.
+     *
+     * @param level the level of the tile
+     * @param kind the kind of tile
+     * @return the limit to be mutable, or maxvalue, if the level or kind does not enable mutation
+     */
+    public static int limit(int level,int kind) {
+        if (kind >= 4 || level <= kind) {
+            return Integer.MAX_VALUE;
+        }
+        return (int)(Math.pow(Board.THRESHOLD + 1, level - kind) * Math.pow(Board.THRESHOLD + 2, kind));
+    }
+
 }
