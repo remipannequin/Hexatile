@@ -48,10 +48,9 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         bestTileRotAnim.setInterpolator(new AccelerateDecelerateInterpolator());
         bestTileRotAnim.setRepeatMode(Animation.REVERSE);
         bestTileRotAnim.setRepeatCount(Animation.INFINITE);
-        bestTileRotAnim.start();
-
-
-
+        if (! BuildConfig.DEBUG) {
+             bestTileRotAnim.start();
+        }
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
     }
@@ -60,16 +59,17 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
-        //TODO: only in debug
         if (event.getAction() == MotionEvent.ACTION_UP && BuildConfig.DEBUG) {
             float y = event.getY();
             if (y >= bestTile.getTop() && y <= bestTile.getBottom()) {
+
                 Tile t = bestTile.getTile();
                 int l = t.getLevel();
                 int k = t.getKind();
                 if (l >= (Tile.MAX_TILE_LEVEL-1)) {
-                    t.setLevel(1);
-                    t.setKind((k % Tile.MAX_TILE_KIND) + 1);
+                    k = (k % Tile.MAX_TILE_KIND) + 1;
+                    t.setLevel(k);
+                    t.setKind(k);
                 } else {
                     t.setLevel(l + 1);
                 }
