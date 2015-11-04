@@ -26,8 +26,8 @@ public class Board implements Parcelable {
     private final int height;
     private int score;
     private boolean dirty = false;
-    private Stat stat;
-    private List<BoardEventListener> listeners;
+    private final Stat stat;
+    private final List<BoardEventListener> listeners;
 
     public Board(int width, int height) {
         this.width = width;

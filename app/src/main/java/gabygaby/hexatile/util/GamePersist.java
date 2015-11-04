@@ -33,15 +33,15 @@ import gabygaby.hexatile.game.Tile;
  */
 public class GamePersist implements Board.BoardEventListener {
     private Context context;
-    String FILENAME_HIGHSCORE = "highscore"; //NON-NLS
-    String FILENAME_CURRENT = "current"; //NON-NLS
+    final String FILENAME_HIGHSCORE = "highscore"; //NON-NLS
+    final String FILENAME_CURRENT = "current"; //NON-NLS
 
     private int bestTile;
     private int highScore;
     private Board board;
 
 
-    private static GamePersist ourInstance = new GamePersist();
+    private static final GamePersist ourInstance = new GamePersist();
 
     public static GamePersist getInstance() {
         return ourInstance;
@@ -106,8 +106,8 @@ public class GamePersist implements Board.BoardEventListener {
         }
     }
 
-    public boolean isInitialized() {
-        return context != null;
+    public boolean needsInitialization() {
+        return context == null;
     }
 
     private void write_score() {

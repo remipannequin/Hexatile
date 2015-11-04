@@ -1,9 +1,7 @@
 package gabygaby.hexatile;
 
 import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -11,9 +9,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
-import com.google.android.gms.plus.Plus;
 import com.google.example.games.basegameutils.BaseGameActivity;
-import com.google.example.games.basegameutils.GameHelper;
 
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -46,7 +42,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         }
         if (board == null) {
             GamePersist gp = GamePersist.getInstance();
-            if (!gp.isInitialized()) {
+            if (gp.needsInitialization()) {
                 gp.init(getApplicationContext());
             }
             if (gp.hasUnfinishedGame()) {
@@ -71,7 +67,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
      */
     private void restart() {
         GamePersist gp = GamePersist.getInstance();
-        if (!gp.isInitialized()) {
+        if (gp.needsInitialization()) {
             gp.init(getApplicationContext());
         }
         board = new Board(5, 6);
@@ -87,11 +83,6 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-    }
-
-    @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
@@ -99,7 +90,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     
     public void gameOver() {
         GamePersist gp = GamePersist.getInstance();
-        if (!gp.isInitialized()) {
+        if (gp.needsInitialization()) {
             gp.init(getApplicationContext());
         }
         gp.finishGame();

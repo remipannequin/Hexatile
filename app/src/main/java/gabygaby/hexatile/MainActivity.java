@@ -2,9 +2,9 @@ package gabygaby.hexatile;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -48,19 +48,44 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         bestTileRotAnim.setInterpolator(new AccelerateDecelerateInterpolator());
         bestTileRotAnim.setRepeatMode(Animation.REVERSE);
         bestTileRotAnim.setRepeatCount(Animation.INFINITE);
-        bestTileRotAnim.start();
-
+        if (! BuildConfig.DEBUG) {
+             bestTileRotAnim.start();
+        }
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
     }
 
 
     @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        if (event.getAction() == MotionEvent.ACTION_UP && BuildConfig.DEBUG) {
+            float y = event.getY();
+            if (y >= bestTile.getTop() && y <= bestTile.getBottom()) {
+
+                Tile t = bestTile.getTile();
+                int l = t.getLevel();
+                int k = t.getKind();
+                if (l >= (Tile.MAX_TILE_LEVEL-1)) {
+                    k = (k % Tile.MAX_TILE_KIND) + 1;
+                    t.setLevel(k);
+                    t.setKind(k);
+                } else {
+                    t.setLevel(l + 1);
+                }
+                bestTile.syncDrawnLevel();
+                bestTile.invalidate();
+            }
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        //get level from saved highscores
+        //get level from saved high scores
         GamePersist gp = GamePersist.getInstance();
-        if (!gp.isInitialized()) {
+        if (gp.needsInitialization()) {
             gp.init(getApplicationContext());
         }
 
@@ -72,21 +97,6 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         } else {
             newGameButton.setText(R.string.new_game);
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-    }
-
-    @Override
-    protected void onPostResume() {
-        super.onPostResume();
     }
 
 
@@ -106,9 +116,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     /**
      * show game activity
      *
-     * @param v
      */
-    public void onGameButtonClicked(View v) {
+    public void onGameButtonClicked(View view) {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }

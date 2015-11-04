@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="fill_parent" android:background="@android:color/white" tools:context=".GameActivity"
-    android:orientation="vertical">
+    android:layout_height="fill_parent" tools:context=".GameActivity"
+    android:orientation="vertical"
+    android:background="#fafafa">
 
     <!-- The primary full-screen view. This can be replaced with whatever view
          is needed to present your content, e.g. VideoView, SurfaceView,
@@ -10,11 +11,11 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0"
+        android:text=""
         android:id="@+id/scoreTextView"
         android:enabled="true"
         android:gravity="fill_vertical|end"
-        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
         android:textStyle="bold"
         android:typeface="monospace"
         android:textColor="@android:color/black"
@@ -29,7 +30,6 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:keepScreenOn="true"
-        android:background="#fafafa"
         app:tileSize="33dp"
         app:meshColor="#bdbdbd"
         android:layout_gravity="center_horizontal|bottom"
@@ -39,7 +39,8 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
-        android:layout_alignParentBottom="true" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp" />
 
     <gabygaby.hexatile.ui.TileGeneratorView
         android:layout_width="fill_parent"

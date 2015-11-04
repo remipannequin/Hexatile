@@ -10,7 +10,8 @@ import java.util.Set;
  */
 public class Tile {
     
-    public static final int MAX_TILE_LEVEL = 8;
+    public static final int MAX_TILE_LEVEL = 9;
+    public static final int MAX_TILE_KIND = 4;
 
     /**
      * neighbours
@@ -27,7 +28,7 @@ public class Tile {
     /**
      * index of the tile in the board
      */
-    private int index;
+    private final int index;
     /**
      * the total number of level 1 tiles that have been fused to create this tile
      */
@@ -35,12 +36,12 @@ public class Tile {
 
     /**
      * CReate a new tile. If level is not zero, the kind is the first (vegetal)
-     * @param index
-     * @param v
+     * @param index the index of the new tile in the board (if any)
+     * @param level the level of the new tile
      */
-    public Tile(int index, int v) {
-        this.level = v;
-        kind = (level == 0 ? 0 : 1);
+    public Tile(int index, int level) {
+        this.level = level;
+        kind = (this.level == 0 ? 0 : 1);
         this.index = index;
     }
 
@@ -96,10 +97,7 @@ public class Tile {
      *
      */
     public boolean isMutable() {
-        if (level < 2 || kind >= 4) {
-            return false;
-        }
-        int limit = (int)Math.pow(5, kind) * (int)Math.pow(4, level - kind - 1);
+        int limit = Score.limit(level, kind);
         return value >= limit;
     }
 

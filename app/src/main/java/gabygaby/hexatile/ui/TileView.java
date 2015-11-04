@@ -23,19 +23,17 @@ import gabygaby.hexatile.game.Tile;
 public class TileView extends View {
 
     private Paint decoPaint;
-    private Paint[][] tilePaint = new Paint[4][8];
+    private final Paint[][] tilePaint = new Paint[4][8];
     private int decoColor = Color.WHITE;
     private Tile tile;
     private Path drawing;
-    private Path hexa;
-    private Path[] levelPath;
     private Matrix rot_matrix;
     private Matrix scale_matrix;
     private Matrix flip_matrix;
     private int drawnLevel;
     private boolean mutable = false;
-    private Path plusPath;
-    private float strokeWidth;
+    private int drawnKind;
+
 
     public TileView(Context context) {
         super(context);
@@ -61,17 +59,12 @@ public class TileView extends View {
                 decoColor);
 
         Resources r = getResources();
-        strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, r.getDisplayMetrics());
+        float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.5f, r.getDisplayMetrics());
         strokeWidth = a.getDimension(
             R.styleable.TileView_strokeWidth,
-            strokeWidth);
+                strokeWidth);
 
         a.recycle();
-
-        if (this.isInEditMode()) {
-            Tile t = new Tile(6,0);
-            setTile(t);
-        }
 
         decoPaint = new Paint();
         decoPaint.setStrokeWidth(strokeWidth);
@@ -86,92 +79,23 @@ public class TileView extends View {
         for (int k = 0; k < color_arrays.length; k++) {
             int[] levelColors = getContext().getResources().getIntArray(color_arrays[k]);
             for (int i = 0; i < 8; i++) {
-                tilePaint[k][i]=new Paint();
+                tilePaint[k][i] = new Paint();
                 tilePaint[k][i].setStyle(Paint.Style.FILL);
                 tilePaint[k][i].setColor(levelColors[i]);
             }
         }
 
-
         drawing = new Path();
-
-        hexa = new Path();
-        hexa.moveTo(0, 1);
-        hexa.lineTo(BoardView.COS, BoardView.SIN);
-        hexa.lineTo(BoardView.COS, -BoardView.SIN);
-        hexa.lineTo(0, -1);
-        hexa.lineTo(-BoardView.COS, -BoardView.SIN);
-        hexa.lineTo(-BoardView.COS, BoardView.SIN);
-        //hexa.lineTo(0, 1);
-        hexa.close();
-        hexa.setFillType(Path.FillType.WINDING);
-
-        levelPath = new Path[6];
-        levelPath[0] = new Path();
-        levelPath[0].moveTo(0, 0.9f);
-        levelPath[0].lineTo(0, 0.7f);
-
-        levelPath[1] = new Path();
-        levelPath[1].moveTo(-0.1f, 0.7f);
-        levelPath[1].lineTo(0, 0.9f);
-        levelPath[1].lineTo(0.1f, 0.7f);
-
-        levelPath[2] = new Path();
-        levelPath[2].moveTo(-0.1f, 0.7f);
-        levelPath[2].lineTo(0, 0.9f);
-        levelPath[2].lineTo(0.1f, 0.7f);
-        levelPath[2].close();
-
-        levelPath[3] = new Path();
-        levelPath[3].moveTo(0, 0.5f);
-        levelPath[3].lineTo(0, 0.7f);
-        levelPath[3].lineTo(0.1f, 0.7f);
-        levelPath[3].lineTo(0, 0.9f);
-        levelPath[3].lineTo(-0.1f, 0.7f);
-        levelPath[3].lineTo(0, 0.7f);
-
-        levelPath[4] = new Path();
-        levelPath[4].moveTo(BoardView.COS / 4f, 0.375f);
-        levelPath[4].lineTo(0, 0.5f);
-        levelPath[4].lineTo(0, 0.7f);
-        levelPath[4].lineTo(0.1f, 0.7f);
-        levelPath[4].lineTo(0, 0.9f);
-        levelPath[4].lineTo(-0.1f, 0.7f);
-        levelPath[4].lineTo(0, 0.7f);
-        levelPath[4].lineTo(0, 0.5f);
-        levelPath[4].lineTo(-BoardView.COS/4f, 0.375f);
-
-        levelPath[5] = new Path();
-        levelPath[5].moveTo(BoardView.COS / 4f, 0.125f);
-        levelPath[5].lineTo(0, 0.5f);
-        levelPath[5].lineTo(0, 0.7f);
-        levelPath[5].lineTo(0.1f, 0.7f);
-        levelPath[5].lineTo(0, 0.9f);
-        levelPath[5].lineTo(-0.1f, 0.7f);
-        levelPath[5].lineTo(0, 0.7f);
-        levelPath[5].lineTo(0, 0.5f);
-        levelPath[5].lineTo(-BoardView.COS/4f, 0.125f);
-
-        plusPath = new Path();
-        plusPath.moveTo(0, 0.3f);
-        plusPath.lineTo(0, -0.3f);
-        plusPath.moveTo(0.3f, 0);
-        plusPath.lineTo(-0.3f, 0);
-
-
         scale_matrix = new Matrix();
         rot_matrix = new Matrix();
         flip_matrix = new Matrix();
+
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        //int paddingLeft = getPaddingStart();
-        //int paddingTop = getPaddingTop();
-        //int paddingRight = getPaddingEnd();
-        //int paddingBottom = getPaddingBottom();
         int width= MeasureSpec.getSize(widthMeasureSpec);
         int height = MeasureSpec.getSize(heightMeasureSpec);
         scale_matrix.setScale((float)width/(2f*BoardView.COS), (float)height/2f);
@@ -191,22 +115,21 @@ public class TileView extends View {
 
         if (tile != null) {
             drawing.reset();
+            Path hexa = TileDecorator.getInstance().getHexagon();
             hexa.transform(flip_matrix, drawing);
-            //canvas.drawPath(drawing, meshPaint);
-            int kind = tile.getKind();
-            if (drawnLevel > 0 && kind >= 1) {
 
+            if (drawnLevel >= 1 && drawnKind >= 1) {
                 drawing.transform(scale_matrix);
-                // vegetal is 1, 0 is for empty tiles
-                canvas.drawPath(drawing, tilePaint[kind-1][drawnLevel]);
+                canvas.drawPath(drawing, tilePaint[drawnKind - 1][drawnLevel - 1]);
             }
 
-            if (drawnLevel >= 2 && levelPath[drawnLevel - 2] != null) {
+            if (drawnLevel >= 2) {
                 drawing.reset();
                 rot_matrix.reset();
                 for (int k = 0; k < 6; k++) {
                     rot_matrix.setRotate(60 * k);
-                    levelPath[drawnLevel - 2].transform(rot_matrix, drawing);
+                    Path levelPath = TileDecorator.getInstance().getLevelDecoration(drawnLevel, drawnKind);
+                    levelPath.transform(rot_matrix, drawing);
                     drawing.transform(flip_matrix);
                     drawing.transform(scale_matrix);
                     canvas.drawPath(drawing, decoPaint);
@@ -215,6 +138,7 @@ public class TileView extends View {
 
             if (mutable) {
                 drawing.reset();
+                Path plusPath = TileDecorator.getInstance().getPlus();
                 plusPath.transform(flip_matrix, drawing);
                 drawing.transform(scale_matrix);
                 canvas.drawPath(drawing, decoPaint);
@@ -228,8 +152,6 @@ public class TileView extends View {
      */
     public void setFlip(float value) {
         flip_matrix.setScale(Math.abs(value), 1);
-        //freeze drawnLevel from tile
-        //frozen = value < 0;
     }
 
     public void setDecoColor(int decoColor) {
@@ -248,6 +170,7 @@ public class TileView extends View {
         drawnLevel++;
         if (tile != null) {
             mutable = tile.isMutable();
+            drawnKind = tile.getKind();
         }
     }
 
@@ -255,12 +178,15 @@ public class TileView extends View {
         if (tile != null) {
             drawnLevel = tile.getLevel();
             mutable = tile.isMutable();
+            drawnKind = tile.getKind();
         }
     }
 
     public void setDrawnLevel(int level) {
+        drawnLevel = level;
         if (tile != null) {
-            drawnLevel = level;
+            mutable = tile.isMutable();
+            drawnKind = tile.getKind();
         }
     }
 

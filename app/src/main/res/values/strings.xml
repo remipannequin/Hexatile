@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name">Hexatile</string>
-    <string name="achievement">Achievement unlocked</string>
     <string name="title_activity_game">Hexatile</string>
-    <string name="signin_other_error">error in sign in</string>
     <string name="button_resume_game">Resume Game</string>
     <string name="best_score">Best score</string>
     <string name="new_game">New Game</string>
     <string name="quit">Quit</string>
     <string name="game_over">Game Over</string>
+    <string name="sign_out">Sign Out</string>
 </resources>
