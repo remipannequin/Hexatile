@@ -22,9 +22,7 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.CycleInterpolator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -47,7 +45,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     private TileGenerator generator;
 
     private GestureDetector gestureDetector;
-    private List<Path> mesh;
+    private Path mesh;
     private Map<PointF, Tile> centers;
     private int additionalPadding;
     private Paint meshPaint;
@@ -57,6 +55,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
     private boolean moving = false;
     private boolean blockMoving;
+    private float strokeWidth;
 
     public BoardView(Context context) {
         super(context);
@@ -91,10 +90,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
         collapseAnimator = new CollapseAnimator();
         centers = new HashMap<>();
-        mesh = new ArrayList<>();
+        mesh = new Path();
 
         Resources r = getResources();
-        float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, r.getDisplayMetrics());
+        strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, r.getDisplayMetrics());
         meshPaint = new Paint();
         meshPaint.setStrokeWidth(strokeWidth);
         meshPaint.setStyle(Paint.Style.STROKE);
@@ -227,13 +226,15 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        //case where the width is the limiting dimention
-        tileWidth = (int) Math.floor(width / (board.getWidth() + 0.5f)) - 1;
+        int padding = (int)Math.ceil(strokeWidth);
+        int width = MeasureSpec.getSize(widthMeasureSpec) - 2 * padding ;
+        //case where the width is the limiting dimension
+        tileWidth = (int) Math.floor(width / (board.getWidth() + 0.5f));
         additionalPadding = Math.round(((width) - (int) (tileWidth * (board.getWidth() + 0.5))) * 0.5f);
         tileHeight = Math.round(tileWidth / COS);
-        setMeasuredDimension(width, (int) Math.round((board.getHeight() - (board.getHeight() - 1) * 0.25) * tileHeight));
+        setMeasuredDimension(width, (int) Math.round((board.getHeight() - (board.getHeight() - 1) * 0.25) * tileHeight) + 2 * padding);
 
+        setPadding(padding, padding, padding, padding);
         int child_height = MeasureSpec.makeMeasureSpec(tileHeight, MeasureSpec.EXACTLY);
         int child_width = MeasureSpec.makeMeasureSpec(tileWidth, MeasureSpec.EXACTLY);
 
@@ -242,52 +243,51 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
             View v = getChildAt(i);
             v.measure(child_width, child_height);
         }
+        mesh = getMesh(tileHeight, tileWidth);
+    }
+
+    public Path getMesh(int tileHeight, int TileWidth) {
+        //TODO test if new generation is required
+
         Matrix tr = new Matrix();
         tr.setTranslate(getPaddingLeft() + additionalPadding / 2, getPaddingTop());
-        mesh.clear();
+        Path path = new Path();
+        path.reset();
         for (float j = 0; j < board.getHeight() / 1.5; j += 1.5) {
-            Path p1 = new Path();
-            p1.moveTo(0.5f * tileWidth, (j + 1f) * tileHeight);
-            p1.lineTo(0, (0.75f + j) * tileHeight);
-            for (int i = 0; i < board.getWidth(); i++) {
-                p1.moveTo(i * tileWidth, (0.75f + j) * tileHeight);
-                p1.lineTo(i * tileWidth, (0.25f + j) * tileHeight);
-                p1.lineTo(tileWidth * (i + 0.5f), j * tileHeight);
-                p1.lineTo(tileWidth * (i + 1), (0.25f + j) * tileHeight);
-                p1.lineTo(tileWidth * (i + 1), (0.75f + j) * tileHeight);
-            }
-            p1.transform(tr);
-            mesh.add(p1);
 
-            Path p2 = new Path();
+            path.moveTo(0.5f * tileWidth, (j + 1f) * tileHeight);
+            path.lineTo(0, (0.75f + j) * tileHeight);
             for (int i = 0; i < board.getWidth(); i++) {
-                p2.moveTo((i + 0.5f) * tileWidth, (1.5f + j) * tileHeight);
-                p2.lineTo((i + 0.5f) * tileWidth, (1f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1f), (0.75f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1.5f), (1f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1.5f), (1.5f + j) * tileHeight);
+                path.moveTo(i * tileWidth, (0.75f + j) * tileHeight);
+                path.lineTo(i * tileWidth, (0.25f + j) * tileHeight);
+                path.lineTo(tileWidth * (i + 0.5f), j * tileHeight);
+                path.lineTo(tileWidth * (i + 1), (0.25f + j) * tileHeight);
+                path.lineTo(tileWidth * (i + 1), (0.75f + j) * tileHeight);
             }
-            p2.lineTo(tileWidth * (board.getWidth()), (1.75f + j) * tileHeight);
-            p2.transform(tr);
-            mesh.add(p2);
+
+            for (int i = 0; i < board.getWidth(); i++) {
+                path.moveTo((i + 0.5f) * tileWidth, (1.5f + j) * tileHeight);
+                path.lineTo((i + 0.5f) * tileWidth, (1f + j) * tileHeight);
+                path.lineTo(tileWidth * (i + 1f), (0.75f + j) * tileHeight);
+                path.lineTo(tileWidth * (i + 1.5f), (1f + j) * tileHeight);
+                path.lineTo(tileWidth * (i + 1.5f), (1.5f + j) * tileHeight);
+            }
+            path.lineTo(tileWidth * (board.getWidth()), (1.75f + j) * tileHeight);
         }
 
-        Path p3 = new Path();
         for (int i = 0; i < board.getWidth(); i++) {
-            p3.moveTo((i + 0.5f) * tileWidth, (board.getHeight() * 0.75f) * tileHeight);
-            p3.lineTo((i + 1f) * tileWidth, (0.25f + board.getHeight() * 0.75f) * tileHeight);
-            p3.lineTo(tileWidth * (i + 1.5f), (board.getHeight() * 0.75f) * tileHeight);
+            path.moveTo((i + 0.5f) * tileWidth, (board.getHeight() * 0.75f) * tileHeight);
+            path.lineTo((i + 1f) * tileWidth, (0.25f + board.getHeight() * 0.75f) * tileHeight);
+            path.lineTo(tileWidth * (i + 1.5f), (board.getHeight() * 0.75f) * tileHeight);
         }
-        p3.transform(tr);
-        mesh.add(p3);
+        path.transform(tr);
+        return path;
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (Path p : mesh) {
-            canvas.drawPath(p, meshPaint);
-        }
+        canvas.drawPath(mesh, meshPaint);
     }
 
     public void setBoard(Board board) {
