@@ -5,12 +5,25 @@ Google Play game services IDs.
 -->
 
 <resources>
-    <string name="app_id" translatable="false">81837955339</string>
-    <string name="package_name" translatable="false">gabygaby.hexatile</string>
-    <string name="leaderboard_classic" translatable="false">CgkIi7Kw77ACEAIQAQ</string>
-    <string name="achievement_first_tile" translatable="false">CgkIi7Kw77ACEAIQAg</string>
-    <string name="achievement_over_9000_" translatable="false">CgkIi7Kw77ACEAIQAw</string>
-    <string name="achievement_level_3_" translatable="false">CgkIi7Kw77ACEAIQBA</string>
-    <string name="achievement_level_5_" translatable="false">CgkIi7Kw77ACEAIQBQ</string>
-    <string name="achievement_100_000" translatable="false">CgkIi7Kw77ACEAIQBg</string>
+  <string name="app_id">81837955339</string>
+  <string name="package_name">gabygaby.hexatile</string>
+  <string name="achievement_first_tile">CgkIi7Kw77ACEAIQAg</string>
+  <string name="achievement_first_mutation">CgkIi7Kw77ACEAIQCg</string>
+  <string name="achievement_1000_points">CgkIi7Kw77ACEAIQBg</string>
+  <string name="achievement_3000_points">CgkIi7Kw77ACEAIQBw</string>
+  <string name="achievement_6000_points">CgkIi7Kw77ACEAIQCA</string>
+  <string name="achievement_over_9000_">CgkIi7Kw77ACEAIQAw</string>
+  <string name="achievement_gardener">CgkIi7Kw77ACEAIQBA</string>
+  <string name="achievement_forester">CgkIi7Kw77ACEAIQBQ</string>
+  <string name="achievement_king_kong">CgkIi7Kw77ACEAIQCQ</string>
+  <string name="achievement_rain_maker">CgkIi7Kw77ACEAIQDg</string>
+  <string name="achievement_swimmer">CgkIi7Kw77ACEAIQEA</string>
+  <string name="achievement_poseidon">CgkIi7Kw77ACEAIQCw</string>
+  <string name="achievement_pyromaniac">CgkIi7Kw77ACEAIQDw</string>
+  <string name="achievement_blacksmith">CgkIi7Kw77ACEAIQEQ</string>
+  <string name="achievement_vulcan">CgkIi7Kw77ACEAIQDA</string>
+  <string name="achievement_biologist">CgkIi7Kw77ACEAIQEg</string>
+  <string name="achievement_zoologist">CgkIi7Kw77ACEAIQEw</string>
+  <string name="achievement_anubis">CgkIi7Kw77ACEAIQDQ</string>
+  <string name="leaderboard_classic">CgkIi7Kw77ACEAIQAQ</string>
 </resources>
