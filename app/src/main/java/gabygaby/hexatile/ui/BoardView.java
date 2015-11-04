@@ -47,7 +47,6 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     private GestureDetector gestureDetector;
     private Path mesh;
     private Map<PointF, Tile> centers;
-    private int additionalPadding;
     private Paint meshPaint;
 
     private int tileHeight, tileWidth = 0;
@@ -56,6 +55,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     private boolean moving = false;
     private boolean blockMoving;
     private float strokeWidth;
+    private Matrix padding_translate;
+    private Path drawing;
 
     public BoardView(Context context) {
         super(context);
@@ -102,6 +103,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
         gestureDetector = new GestureDetector(BoardView.this.getContext(), new GestureListener());
         gestureDetector.setIsLongpressEnabled(true);
 
+        padding_translate = new Matrix();
+        drawing = new Path();
         // In edit mode it'animatorSet nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             setBoard(new Board(5, 6));
@@ -215,7 +218,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
                 float tx = (j + offset / 2f) * tileWidth;
                 float ty = (i * 0.75f) * tileHeight;
 
-                v.layout(Math.round(tx + paddingLeft + additionalPadding), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
+                v.layout(Math.round(tx + paddingLeft), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
                 centers.put(new PointF(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2), v.getTile());
 
             }
@@ -230,11 +233,13 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
         int width = MeasureSpec.getSize(widthMeasureSpec) - 2 * padding ;
         //case where the width is the limiting dimension
         tileWidth = (int) Math.floor(width / (board.getWidth() + 0.5f));
-        additionalPadding = Math.round(((width) - (int) (tileWidth * (board.getWidth() + 0.5))) * 0.5f);
+        int additionalPadding = Math.round(((width) - (int) (tileWidth * (board.getWidth() + 0.5))) * 0.5f);
         tileHeight = Math.round(tileWidth / COS);
         setMeasuredDimension(width, (int) Math.round((board.getHeight() - (board.getHeight() - 1) * 0.25) * tileHeight) + 2 * padding);
 
-        setPadding(padding, padding, padding, padding);
+        setPadding(padding + additionalPadding, padding, padding + additionalPadding, padding);
+        padding_translate.reset();
+        padding_translate.setTranslate(getPaddingLeft(), getPaddingTop());
         int child_height = MeasureSpec.makeMeasureSpec(tileHeight, MeasureSpec.EXACTLY);
         int child_width = MeasureSpec.makeMeasureSpec(tileWidth, MeasureSpec.EXACTLY);
 
@@ -243,51 +248,15 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
             View v = getChildAt(i);
             v.measure(child_width, child_height);
         }
-        mesh = getMesh(tileHeight, tileWidth);
-    }
-
-    public Path getMesh(int tileHeight, int TileWidth) {
-        //TODO test if new generation is required
-
-        Matrix tr = new Matrix();
-        tr.setTranslate(getPaddingLeft() + additionalPadding / 2, getPaddingTop());
-        Path path = new Path();
-        path.reset();
-        for (float j = 0; j < board.getHeight() / 1.5; j += 1.5) {
-
-            path.moveTo(0.5f * tileWidth, (j + 1f) * tileHeight);
-            path.lineTo(0, (0.75f + j) * tileHeight);
-            for (int i = 0; i < board.getWidth(); i++) {
-                path.moveTo(i * tileWidth, (0.75f + j) * tileHeight);
-                path.lineTo(i * tileWidth, (0.25f + j) * tileHeight);
-                path.lineTo(tileWidth * (i + 0.5f), j * tileHeight);
-                path.lineTo(tileWidth * (i + 1), (0.25f + j) * tileHeight);
-                path.lineTo(tileWidth * (i + 1), (0.75f + j) * tileHeight);
-            }
-
-            for (int i = 0; i < board.getWidth(); i++) {
-                path.moveTo((i + 0.5f) * tileWidth, (1.5f + j) * tileHeight);
-                path.lineTo((i + 0.5f) * tileWidth, (1f + j) * tileHeight);
-                path.lineTo(tileWidth * (i + 1f), (0.75f + j) * tileHeight);
-                path.lineTo(tileWidth * (i + 1.5f), (1f + j) * tileHeight);
-                path.lineTo(tileWidth * (i + 1.5f), (1.5f + j) * tileHeight);
-            }
-            path.lineTo(tileWidth * (board.getWidth()), (1.75f + j) * tileHeight);
-        }
-
-        for (int i = 0; i < board.getWidth(); i++) {
-            path.moveTo((i + 0.5f) * tileWidth, (board.getHeight() * 0.75f) * tileHeight);
-            path.lineTo((i + 1f) * tileWidth, (0.25f + board.getHeight() * 0.75f) * tileHeight);
-            path.lineTo(tileWidth * (i + 1.5f), (board.getHeight() * 0.75f) * tileHeight);
-        }
-        path.transform(tr);
-        return path;
+        mesh = TileDecorator.getInstance().getMesh(tileHeight, tileWidth, board.getHeight(), board.getWidth());
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawPath(mesh, meshPaint);
+        drawing.reset();
+        mesh.transform(padding_translate, drawing);
+        canvas.drawPath(drawing, meshPaint);
     }
 
     public void setBoard(Board board) {

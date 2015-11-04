@@ -20,6 +20,8 @@ public class TileDecorator {
     private final Path[] waterLevel;
     private final Path[] fireLevel;
     private final Path[] lifeLevel;
+    private Path mesh;
+    private long meshHash = 0;
 
 
     public static TileDecorator getInstance() {
@@ -303,49 +305,49 @@ public class TileDecorator {
         lifeLevel[2].addArc(new RectF(-.10f, 0.50f, 0.10f, 0.75f), 0, 360);
         lifeLevel[2].moveTo( -.03f, .83f);
         lifeLevel[2].cubicTo(-.03f, 0.83f, -.04f, 0.93f, -.08f, 0.88f);
-        lifeLevel[2].moveTo( 0.03f, .83f);
+        lifeLevel[2].moveTo(0.03f, .83f);
         lifeLevel[2].cubicTo(0.03f, 0.83f, 0.04f, 0.93f, 0.08f, 0.88f);
-        lifeLevel[2].moveTo( -.09f, .69f);
+        lifeLevel[2].moveTo(-.09f, .69f);
         lifeLevel[2].cubicTo(-.09f, 0.69f, -.15f, 0.75f, -.15f, 0.80f);
-        lifeLevel[2].moveTo( 0.09f, .69f);
+        lifeLevel[2].moveTo(0.09f, .69f);
         lifeLevel[2].cubicTo(0.09f, 0.69f, 0.15f, 0.75f, 0.15f, 0.80f);
-        lifeLevel[2].moveTo( -.10f, 0.625f);
-        lifeLevel[2].lineTo( -.15f, 0.625f);
-        lifeLevel[2].moveTo( 0.10f, 0.625f);
-        lifeLevel[2].lineTo( 0.15f, 0.625f);
-        lifeLevel[2].moveTo( -.09f, .56f);
+        lifeLevel[2].moveTo(-.10f, 0.625f);
+        lifeLevel[2].lineTo(-.15f, 0.625f);
+        lifeLevel[2].moveTo(0.10f, 0.625f);
+        lifeLevel[2].lineTo(0.15f, 0.625f);
+        lifeLevel[2].moveTo(-.09f, .56f);
         lifeLevel[2].cubicTo(-.09f, 0.56f, -.15f, 0.50f, -.15f, 0.45f);
-        lifeLevel[2].moveTo( 0.09f, .56f);
+        lifeLevel[2].moveTo(0.09f, .56f);
         lifeLevel[2].cubicTo(0.09f, 0.56f, 0.15f, 0.50f, 0.15f, 0.45f);
 
 
         // tiger / wolf face
         lifeLevel[3] = new Path();
         lifeLevel[3].addArc(new RectF(-.05f, 0.575f, 0.05f, 0.625f), 0, 360);
-        lifeLevel[3].moveTo( 0.00f, 0.50f);
+        lifeLevel[3].moveTo(0.00f, 0.50f);
         lifeLevel[3].lineTo( -.05f, 0.45f);
-        lifeLevel[3].lineTo( -.10f, 0.55f);
-        lifeLevel[3].lineTo( -.15f, 0.55f);
-        lifeLevel[3].lineTo( -.10f, .60f);
-        lifeLevel[3].lineTo( -.15f, 0.60f);
+        lifeLevel[3].lineTo(-.10f, 0.55f);
+        lifeLevel[3].lineTo(-.15f, 0.55f);
+        lifeLevel[3].lineTo(-.10f, .60f);
+        lifeLevel[3].lineTo(-.15f, 0.60f);
         lifeLevel[3].cubicTo(-.16f, 0.64f, -.16f, 0.71f, -.15f, 0.75f);
-        lifeLevel[3].lineTo( -.15f, 0.85f);
-        lifeLevel[3].lineTo( -.10f, 0.80f);
+        lifeLevel[3].lineTo(-.15f, 0.85f);
+        lifeLevel[3].lineTo(-.10f, 0.80f);
         lifeLevel[3].cubicTo(-.03f, 0.82f, 0.03f, 0.82f, 0.10f, 0.80f);
-        lifeLevel[3].lineTo( 0.15f, 0.85f);
-        lifeLevel[3].lineTo( 0.15f, 0.75f);
+        lifeLevel[3].lineTo(0.15f, 0.85f);
+        lifeLevel[3].lineTo(0.15f, 0.75f);
         lifeLevel[3].cubicTo(0.16f, 0.71f, 0.16f, 0.64f, 0.15f, 0.60f);
-        lifeLevel[3].lineTo( 0.10f, .60f);
-        lifeLevel[3].lineTo( 0.15f, 0.55f);
-        lifeLevel[3].lineTo( 0.10f, 0.55f);
-        lifeLevel[3].lineTo( 0.05f, 0.45f);
-        lifeLevel[3].lineTo( 0.00f, 0.50f);
-        lifeLevel[3].moveTo( -.10f, 0.75f);
-        lifeLevel[3].lineTo( -.05f, 0.725f);
-        lifeLevel[3].lineTo( -.05f, 0.60f);
-        lifeLevel[3].moveTo( 0.10f, 0.75f);
-        lifeLevel[3].lineTo( 0.05f, 0.725f);
-        lifeLevel[3].lineTo( 0.05f, 0.60f);
+        lifeLevel[3].lineTo(0.10f, .60f);
+        lifeLevel[3].lineTo(0.15f, 0.55f);
+        lifeLevel[3].lineTo(0.10f, 0.55f);
+        lifeLevel[3].lineTo(0.05f, 0.45f);
+        lifeLevel[3].lineTo(0.00f, 0.50f);
+        lifeLevel[3].moveTo(-.10f, 0.75f);
+        lifeLevel[3].lineTo(-.05f, 0.725f);
+        lifeLevel[3].lineTo(-.05f, 0.60f);
+        lifeLevel[3].moveTo(0.10f, 0.75f);
+        lifeLevel[3].lineTo(0.05f, 0.725f);
+        lifeLevel[3].lineTo(0.05f, 0.60f);
 
 
 
@@ -368,6 +370,56 @@ public class TileDecorator {
 
 
         empty = new Path();
+    }
+
+
+    /**
+     * Generate a mesh to draw the background mesh of the board
+     * @param tileHeight the height of a tile
+     * @param tileWidth the width of a tuile
+     * @param boardHeight the number of rows in the board
+     * @param boardWidth the number of column in the board
+     * @return the mesh generated
+     */
+    public Path getMesh(int tileHeight, int tileWidth, int boardHeight, int boardWidth) {
+        //test if new generation is required
+        long hash = (tileHeight & 0xFFFF) << 48 +
+                (tileWidth & 0xFFFF) << 32 +
+                (boardHeight & 0xFFFF) << 16 +
+                (boardWidth & 0xFFFF);
+
+        if (mesh == null || this.meshHash != hash) {
+            meshHash = hash;
+            mesh = new Path();
+            for (float j = 0; j < boardHeight / 1.5; j += 1.5) {
+
+                mesh.moveTo(0.5f * tileWidth, (j + 1f) * tileHeight);
+                mesh.lineTo(0, (0.75f + j) * tileHeight);
+                for (int i = 0; i < boardWidth; i++) {
+                    mesh.moveTo(i * tileWidth, (0.75f + j) * tileHeight);
+                    mesh.lineTo(i * tileWidth, (0.25f + j) * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 0.5f), j * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 1), (0.25f + j) * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 1), (0.75f + j) * tileHeight);
+                }
+
+                for (int i = 0; i < boardWidth; i++) {
+                    mesh.moveTo((i + 0.5f) * tileWidth, (1.5f + j) * tileHeight);
+                    mesh.lineTo((i + 0.5f) * tileWidth, (1f + j) * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 1f), (0.75f + j) * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 1.5f), (1f + j) * tileHeight);
+                    mesh.lineTo(tileWidth * (i + 1.5f), (1.5f + j) * tileHeight);
+                }
+                mesh.lineTo(tileWidth * (boardWidth), (1.75f + j) * tileHeight);
+            }
+
+            for (int i = 0; i < boardWidth; i++) {
+                mesh.moveTo((i + 0.5f) * tileWidth, (boardHeight * 0.75f) * tileHeight);
+                mesh.lineTo((i + 1f) * tileWidth, (0.25f + boardHeight * 0.75f) * tileHeight);
+                mesh.lineTo(tileWidth * (i + 1.5f), (boardHeight * 0.75f) * tileHeight);
+            }
+        }
+        return mesh;
     }
 
 
