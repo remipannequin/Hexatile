@@ -10,7 +10,7 @@ import java.util.Set;
  */
 public class Tile {
     
-    public static final int MAX_TILE_LEVEL = 8;
+    public static final int MAX_TILE_LEVEL = 9;
     public static final int MAX_TILE_KIND = 4;
 
     /**

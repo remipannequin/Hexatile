@@ -83,7 +83,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     @Override
     protected void onStart() {
         super.onStart();
-        //get level from saved highscores
+        //get level from saved high scores
         GamePersist gp = GamePersist.getInstance();
         if (gp.needsInitialization()) {
             gp.init(getApplicationContext());

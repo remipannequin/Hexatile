@@ -170,6 +170,7 @@ public class TileView extends View {
         drawnLevel++;
         if (tile != null) {
             mutable = tile.isMutable();
+            drawnKind = tile.getKind();
         }
     }
 
@@ -182,8 +183,10 @@ public class TileView extends View {
     }
 
     public void setDrawnLevel(int level) {
+        drawnLevel = level;
         if (tile != null) {
-            drawnLevel = level;
+            mutable = tile.isMutable();
+            drawnKind = tile.getKind();
         }
     }
 

@@ -67,7 +67,7 @@ public class Score {
         if (kind >= Tile.MAX_TILE_KIND || level <= kind) {
             return Integer.MAX_VALUE;
         }
-        return (int)(Math.pow(Board.THRESHOLD + 1, level - kind) * Math.pow(Board.THRESHOLD + 2, kind));
+        return (int)(Math.pow(Board.THRESHOLD + 1, level - kind - 1) * Math.pow(Board.THRESHOLD + 2, kind));
     }
 
 }
