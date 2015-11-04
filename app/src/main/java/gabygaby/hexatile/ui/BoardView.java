@@ -46,7 +46,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
     private GestureDetector gestureDetector;
     private Path mesh;
-    private Map<PointF, Tile> centers;
+    private Map<Tile, PointF> centers;
     private Paint meshPaint;
 
     private int tileHeight, tileWidth = 0;
@@ -176,10 +176,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
      */
     private Tile findTileAt(float x, float y) {
         Tile selected = null;
-        for (Map.Entry<PointF, Tile> center : centers.entrySet()) {
-            double d = Math.pow(x - center.getKey().x, 2) + Math.pow(y - center.getKey().y, 2);
+        for (Map.Entry<Tile, PointF> center : centers.entrySet()) {
+            double d = Math.pow(x - center.getValue().x, 2) + Math.pow(y - center.getValue().y, 2);
             if (d < Math.pow(tileWidth / 2, 2)) {
-                selected = center.getValue();
+                selected = center.getKey();
                 break;
             }
         }
@@ -219,8 +219,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
                 float ty = (i * 0.75f) * tileHeight;
 
                 v.layout(Math.round(tx + paddingLeft), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
-                centers.put(new PointF(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2), v.getTile());
-
+                PointF p = centers.get(v.getTile());
+                p.set(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2);
             }
         }
     }
@@ -268,6 +268,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
             child.setDecoColor(decoColor);
             child.setTile(t);
             this.addView(child, i++);
+            centers.put(t, new PointF());
         }
         board.addListener(this);
     }
