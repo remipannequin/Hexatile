@@ -282,7 +282,7 @@ public class TileDecorator {
         fireLevel[4].cubicTo(-.30f, 0.70f, -.35f, 0.65f, -.35f, 0.75f);
         fireLevel[4].cubicTo(-.40f, 0.70f, -.35f, 0.65f, -.35f, 0.60f);
 
-        // unicell (DNA ?)
+        // unicellular
         lifeLevel[0] = new Path();
         lifeLevel[0].addCircle(0.00f, 0.75f, 0.15f, Path.Direction.CW);
         lifeLevel[0].addCircle(0.05f, 0.78f, 0.05f, Path.Direction.CW);

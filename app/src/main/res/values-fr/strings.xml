@@ -7,4 +7,5 @@
     <string name="title_activity_game">Hexatile</string>
     <string name="game_over">Partie terminée</string>
     <string name="quit">Quiter</string>
+    <string name="sign_out">Déconnexion</string>
 </resources>
