@@ -16,7 +16,7 @@ import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
 
 /**
- * Persist game information (highscore, bestTile, current game in a private file.
+ * Persist game information (high score, bestTile, current game in a private file.
  *
  * Structure of the file
  * int (4 bytes) high score

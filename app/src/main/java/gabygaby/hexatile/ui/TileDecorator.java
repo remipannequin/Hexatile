@@ -11,7 +11,7 @@ import gabygaby.hexatile.game.Tile;
  */
 public class TileDecorator {
     private static final TileDecorator ourInstance = new TileDecorator();
-    private final Path hexa;
+    private final Path hexagon;
 
     private final Path plus;
     private final Path empty;
@@ -31,16 +31,16 @@ public class TileDecorator {
     private TileDecorator() {
 
 
-        hexa = new Path();
-        hexa.moveTo(0, 1);
-        hexa.lineTo(BoardView.COS, BoardView.SIN);
-        hexa.lineTo(BoardView.COS, -BoardView.SIN);
-        hexa.lineTo(0, -1);
-        hexa.lineTo(-BoardView.COS, -BoardView.SIN);
-        hexa.lineTo(-BoardView.COS, BoardView.SIN);
-        //hexa.lineTo(0, 1);
-        hexa.close();
-        hexa.setFillType(Path.FillType.WINDING);
+        hexagon = new Path();
+        hexagon.moveTo(0, 1);
+        hexagon.lineTo(BoardView.COS, BoardView.SIN);
+        hexagon.lineTo(BoardView.COS, -BoardView.SIN);
+        hexagon.lineTo(0, -1);
+        hexagon.lineTo(-BoardView.COS, -BoardView.SIN);
+        hexagon.lineTo(-BoardView.COS, BoardView.SIN);
+        //hexagon.lineTo(0, 1);
+        hexagon.close();
+        hexagon.setFillType(Path.FillType.WINDING);
 
         vegetalLevel = new Path[Tile.MAX_TILE_LEVEL - 1];
         waterLevel = new Path[Tile.MAX_TILE_LEVEL - 2];
@@ -376,7 +376,7 @@ public class TileDecorator {
     /**
      * Generate a mesh to draw the background mesh of the board
      * @param tileHeight the height of a tile
-     * @param tileWidth the width of a tuile
+     * @param tileWidth the width of a tile
      * @param boardHeight the number of rows in the board
      * @param boardWidth the number of column in the board
      * @return the mesh generated
@@ -424,7 +424,7 @@ public class TileDecorator {
 
 
     public Path getHexagon() {
-        return hexa;
+        return hexagon;
     }
 
     public Path getLevelDecoration(int level, int kind) {

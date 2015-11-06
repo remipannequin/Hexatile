@@ -20,7 +20,7 @@ import gabygaby.hexatile.util.GamePersist;
 
 public class GameActivity extends BaseGameActivity implements Board.BoardEventListener {
 
-    public static final String TAG = "hexatil.GameActivity"; //NON-NLS
+    public static final String TAG = "hexatile.GameActivity"; //NON-NLS
 
     private Board board;
     private BoardView boardView;

@@ -141,7 +141,7 @@ public class Board implements Parcelable {
     /**
      * compute if the game is over
      *
-     * @return true if the board is completelly filled
+     * @return true if the board is completely filled
      */
     public boolean isGameOver() {
         for (Tile t : tiles) {
@@ -197,7 +197,7 @@ public class Board implements Parcelable {
     }
 
     /**
-     * Fill selected Tile, if it is empty, and enerate all cascading board events
+     * Fill selected Tile, if it is empty, and generate all cascading board events
      *
      * @param selected selected Tile
      * @param value the level to give to the new tile
@@ -217,7 +217,7 @@ public class Board implements Parcelable {
 
     /**
      * Mutate the selected tile (if possible)
-     * @param selected
+     * @param selected the tile to mutate
      */
     public void mutate(Tile selected) {
         if (selected.isMutable()) {
@@ -242,8 +242,8 @@ public class Board implements Parcelable {
 
     /**
      * Return true if a collapse event will happen
-     * @param selected
-     * @return
+     * @param selected the tile to test for collapse
+     * @return true if the group will collapse
      */
     private boolean willCollapse(Tile selected) {
         return (selected.findGroup().size() > Board.THRESHOLD);
@@ -252,7 +252,7 @@ public class Board implements Parcelable {
     /**
      * Collapse groups if needed until no collapse happen
      * @param selected the tile to check for collapsing
-     * @param willCollapse
+     * @param willCollapse true if a collapsing will happen
      */
     private void clean(Tile selected, boolean willCollapse) {
         while (isDirty()) {
@@ -296,7 +296,7 @@ public class Board implements Parcelable {
 
 
     /**
-     * Interface to be implemented by classes that wan't to be notified of game events
+     * Interface to be implemented by classes that want to be notified of game events
      */
     public interface BoardEventListener {
         /**
