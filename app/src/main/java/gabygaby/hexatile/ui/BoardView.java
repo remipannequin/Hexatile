@@ -105,7 +105,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
         padding_translate = new Matrix();
         drawing = new Path();
-        // In edit mode it'animatorSet nice to have some demo data, so add that here.
+        // In edit mode it's nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             setBoard(new Board(5, 6));
         }
@@ -399,7 +399,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener {
     }
 
     /**
-     * Invalidate all the child tiles. Usefull when setting the board
+     * Invalidate all the child tiles. Useful when setting the board
      */
     public void invalidateAll() {
         for (int i = 0; i < getChildCount(); i++) {

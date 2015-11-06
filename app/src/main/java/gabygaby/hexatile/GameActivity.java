@@ -20,7 +20,7 @@ import gabygaby.hexatile.util.GamePersist;
 
 public class GameActivity extends BaseGameActivity implements Board.BoardEventListener {
 
-    public static final String TAG = "hexatil.GameActivity"; //NON-NLS
+    public static final String TAG = "hexatile.GameActivity"; //NON-NLS
 
     private Board board;
     private BoardView boardView;
@@ -57,7 +57,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         boardView.invalidateAll();
         updateScore();
         TileGenerator generator = new TileGenerator(5);
-        TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
+        TileGeneratorView generatorView = (TileGeneratorView) findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
     }
@@ -76,7 +76,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         boardView.setBoard(board);
         updateScore();
         TileGenerator generator = new TileGenerator(5);
-        TileGeneratorView generatorView = (TileGeneratorView)findViewById(R.id.generator_view);
+        TileGeneratorView generatorView = (TileGeneratorView) findViewById(R.id.generator_view);
         generatorView.setGenerator(generator);
         boardView.setGenerator(generator);
         boardView.invalidateAll();
@@ -87,7 +87,7 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         outState.putParcelable("board", board); //NON-NLS
         super.onSaveInstanceState(outState);
     }
-    
+
     public void gameOver() {
         GamePersist gp = GamePersist.getInstance();
         if (gp.needsInitialization()) {
@@ -131,17 +131,62 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     @Override
     public void onGroupCollapsed(Iterable<Tile> group, Tile promoted) {
         int level = promoted.getLevel();
+        int kind = promoted.getKind();
         GoogleApiClient apiClient = getApiClient();
         if (apiClient != null && apiClient.isConnected()) {
             if (level >= 2) {
                 Games.Achievements.unlock(apiClient, getString(R.string.achievement_first_tile));
             }
-            if (level >= 4) {
-                Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_3_));
+            switch (kind) {
+                case 1:
+                    if (level >= 4) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_gardener));
+                    }
+                    if (level >= 6) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_forester));
+                    }
+                    if (level >= 8) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_king_kong));
+                    }
+                    break;
+
+                case 2:
+                    if (level >= 4) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_rain_maker));
+                    }
+                    if (level >= 6) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_swimmer));
+                    }
+                    if (level >= 8) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_poseidon));
+                    }
+                    break;
+                case 3:
+                    if (level >= 4) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_pyromaniac));
+                    }
+                    if (level >= 6) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_blacksmith));
+                    }
+                    if (level >= 8) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_vulcan));
+                    }
+                    break;
+
+                case 4:
+                    if (level >= 4) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_biologist));
+                    }
+                    if (level >= 6) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_zoologist));
+                    }
+                    if (level >= 8) {
+                        Games.Achievements.unlock(apiClient, getString(R.string.achievement_anubis));
+                    }
+                    break;
+
             }
-            if (level >= 6) {
-                Games.Achievements.unlock(apiClient, getString(R.string.achievement_level_5_));
-            }
+
         } //TODO: if not connected : record progress and send it later
     }
 
@@ -153,12 +198,20 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
         int current_score = board.getScore();
         GoogleApiClient apiClient = getApiClient();
         if (apiClient != null && apiClient.isConnected()) {
+
+            if (current_score > 1000) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_1000_points));
+            }
+            if (current_score > 3000) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_3000_points));
+            }
+            if (current_score > 6000) {
+                Games.Achievements.unlock(apiClient, getString(R.string.achievement_6000_points));
+            }
             if (current_score > 9000) {
                 Games.Achievements.unlock(apiClient, getString(R.string.achievement_over_9000_));
             }
-            if (current_score > 100000) {
-                Games.Achievements.unlock(apiClient, getString(R.string.achievement_100_000));
-            }
+
         } //TODO: if not connected : record progress and send it later
     }
 
@@ -170,6 +223,10 @@ public class GameActivity extends BaseGameActivity implements Board.BoardEventLi
     @Override
     public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
         updateScore();
+        GoogleApiClient apiClient = getApiClient();
+        if (apiClient != null && apiClient.isConnected()) {
+            Games.Achievements.unlock(apiClient, getString(R.string.achievement_first_mutation));
+        }
     }
 
     @Override

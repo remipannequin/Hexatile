@@ -21,17 +21,16 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
     public static final String TAG = "hexatile.MainActivity"; //NON-NLS
 
-    private TextView highscore;
+    private TextView highScore;
     private Button newGameButton;
     private TileView bestTile;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        highscore = (TextView) findViewById(R.id.highScoreTextView);
+        highScore = (TextView) findViewById(R.id.highScoreTextView);
         newGameButton = (Button) findViewById(R.id.gameButton);
         bestTile = (TileView) findViewById(R.id.bestTileView);
         Tile t = new Tile(0, 1);
@@ -89,7 +88,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
             gp.init(getApplicationContext());
         }
 
-        highscore.setText(String.format("%d", gp.highScore())); //NON-NLS
+        highScore.setText(String.format("%d", gp.highScore())); //NON-NLS
         bestTile.getTile().setLevel(gp.bestTileEver());
         bestTile.syncDrawnLevel();
         if (gp.hasUnfinishedGame()) {
@@ -103,7 +102,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     /**
      * Called when clicking the singIn signOut buttons
      *
-     * @param view
+     * @param view the view clicked
      */
     public void onClick(View view) {
         if (isSignedIn()) {

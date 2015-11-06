@@ -35,7 +35,7 @@ public class Tile {
     private int value;
 
     /**
-     * CReate a new tile. If level is not zero, the kind is the first (vegetal)
+     * Create a new tile. If level is not zero, the kind is the first (vegetal)
      * @param index the index of the new tile in the board (if any)
      * @param level the level of the new tile
      */
@@ -102,7 +102,7 @@ public class Tile {
     }
 
     /**
-     * Cunsume this tile (in a colapse event)
+     * Consume this tile (in a collapse event)
      * reset its level, kind and value.
      * @return the value of the tile, to be added to the promoted tile
      */

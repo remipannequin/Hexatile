@@ -19,7 +19,7 @@ public class Score {
      * Compute score in case of group collapse
      * @param last the promoted tile
      * @param group the group
-     * @return
+     * @return the score increment for this event
      */
     public static int collapse(Tile last, Set<Tile> group) {
         int reward = 1;
@@ -40,9 +40,9 @@ public class Score {
 
 
     /**
-     * A mutation of a level-n tile scores the same as a 4-tile group colapse of level-n tiles
-     * @param selected
-     * @return
+     * A mutation of a level-n tile scores the same as a 4-tile group collapse of level-n tiles
+     * @param selected the tile that is mutating
+     * @return the score increment for the mutation
      */
     public static int mutate(Tile selected) {
         int reward = 1;

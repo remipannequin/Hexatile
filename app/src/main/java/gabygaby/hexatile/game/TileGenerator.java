@@ -66,7 +66,7 @@ public class TileGenerator {
     }
 
     /**
-     * Get the tile value (level) either from the nomral source,
+     * Get the tile value (level) either from the normal source,
      * or the tile stored in the stash, depending on the source selected
      * <p/>
      * <p/>

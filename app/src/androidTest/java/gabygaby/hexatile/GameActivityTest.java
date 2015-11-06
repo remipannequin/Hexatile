@@ -1,9 +1,7 @@
 package gabygaby.hexatile;
 
 import android.content.Intent;
-import android.test.ActivityInstrumentationTestCase2;
 import android.test.ActivityUnitTestCase;
-import android.view.View;
 import android.widget.TextView;
 
 /**
