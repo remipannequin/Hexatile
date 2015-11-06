@@ -80,7 +80,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
         gestureDetector = new GestureDetector(TileGeneratorView.this.getContext(), new GestureListener());
         gestureDetector.setIsLongpressEnabled(true);
 
-        // In edit mode it'animatorSet nice to have some demo data, so add that here.
+        // In edit mode it's nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             TileGenerator g = new TileGenerator(4);
             g.stash();
@@ -190,6 +190,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
 
         int v = generator.peekStash();
         Tile t = new Tile(i, v);
+        t.setKind(1);
         final TileView stashView = new TileView(getContext());
         stashView.setTile(t);
         stashView.syncDrawnLevel();
@@ -271,7 +272,7 @@ public class TileGeneratorView extends ViewGroup implements TileGenerator.Genera
             });
             //play all them together
             animSet.playTogether(a1, a2, a3);
-            //on end, update views, reset positions, unhide last tile
+            //on end, update views, reset positions, un-hide last tile
         }
         animSet.start();
         animSet.addListener(new Animator.AnimatorListener() {

@@ -15,10 +15,10 @@ import gabygaby.hexatile.GameActivity;
  */
 public class TileGenerator {
 
-    private int size;
-    private Queue<Integer> futures;
+    private final int size;
+    private final Queue<Integer> futures;
     private int stash;
-    private Collection<GeneratorListener> listeners;
+    private final Collection<GeneratorListener> listeners;
     private boolean stashSelected = false;
 
     public TileGenerator(int bufferSize) {
@@ -66,7 +66,7 @@ public class TileGenerator {
     }
 
     /**
-     * Get the tile value (level) either from the nomral source,
+     * Get the tile value (level) either from the normal source,
      * or the tile stored in the stash, depending on the source selected
      * <p/>
      * <p/>

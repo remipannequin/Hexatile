@@ -4,26 +4,52 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Representation of an hexagonal tile on the board
+ * Logical representation of an hexagonal tile on the board
  *
  * Created by Rémi Pannequin on 25/09/15.
  */
 public class Tile {
+    
+    public static final int MAX_TILE_LEVEL = 9;
+    public static final int MAX_TILE_KIND = 4;
 
-    public static final int MAX_TILE_LEVEL = 8;
-
+    /**
+     * neighbours
+     */
     private Tile right, left, up_left, up_right, down_left, down_right;
+    /**
+     * level of this tile
+     */
     private int level;
-    private int index;
+    /**
+     * Kind of the tile it is
+     */
+    private int kind;
+    /**
+     * index of the tile in the board
+     */
+    private final int index;
+    /**
+     * the total number of level 1 tiles that have been fused to create this tile
+     */
+    private int value;
 
-    public Tile(int index, int v) {
-        this.level = v;
+    /**
+     * Create a new tile. If level is not zero, the kind is the first (vegetal)
+     * @param index the index of the new tile in the board (if any)
+     * @param level the level of the new tile
+     */
+    public Tile(int index, int level) {
+        this.level = level;
+        kind = (this.level == 0 ? 0 : 1);
         this.index = index;
     }
 
-    public void fill(int value) {
+    public void fill(int level) {
         if (isFree()) {
-            level = value;
+            this.kind = 1;
+            this.level = level;
+            this.value = (int)Math.pow(4, level - 1);
         }
     }
 
@@ -52,12 +78,40 @@ public class Tile {
         return level;
     }
 
-    public void promote() {
+    /**
+     * increment the tile's level
+     */
+    public void promote(int group_value) {
         setLevel(this.level + 1);
+        value += group_value;
     }
 
-    public void consume() {
+    /**
+     * increment the tile's kind
+     */
+    public void mutate() {
+        kind++;
+    }
+
+    /**
+     *
+     */
+    public boolean isMutable() {
+        int limit = Score.limit(level, kind);
+        return value >= limit;
+    }
+
+    /**
+     * Consume this tile (in a collapse event)
+     * reset its level, kind and value.
+     * @return the value of the tile, to be added to the promoted tile
+     */
+    public int consume() {
+        int v = value;
         this.level = 0;
+        this.value = 0;
+        this.kind = 0;
+        return v;
     }
 
     public Tile getRight() {
@@ -129,7 +183,9 @@ public class Tile {
      */
     private Set<Tile> findGroup(Set<Tile> group) {
         for (Tile neighbour: getNeighbours()) {
-            if (neighbour.getLevel() == level && !group.contains(neighbour)) {
+            if (neighbour.getLevel() == level &&
+                    neighbour.getKind() == kind &&
+                    !group.contains(neighbour)) {
                 group.add(neighbour);
                 neighbour.findGroup(group);
             }
@@ -137,4 +193,19 @@ public class Tile {
         return group;
     }
 
+    public int getKind() {
+        return kind;
+    }
+
+    public int getValue() {
+        return value;
+    }
+
+    public void setKind(int kind) {
+        this.kind = kind;
+    }
+
+    public void setValue(int value) {
+        this.value = value;
+    }
 }

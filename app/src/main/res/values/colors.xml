@@ -13,17 +13,88 @@
     <color name="teal800">#00695c</color>
     <color name="teal900">#004d40</color>
 
+    <color name="blue100">#bbdefb</color>
+    <color name="blue200">#90caf9</color>
+    <color name="blue300">#64b5f6</color>
+    <color name="blue400">#42a5f5</color>
+    <color name="blue500">#2196f3</color>
+    <color name="blue600">#1e88e5</color>
+    <color name="blue700">#1976d2</color>
+    <color name="blue800">#1565c0</color>
+    <color name="blue900">#0d47a1</color>
 
-    <array name="teal_theme">
-        <item>@color/teal50</item>
-        <item>@color/teal200</item>
-        <item>@color/teal300</item>
-        <item>@color/teal400</item>
-        <item>@color/teal500</item>
-        <item>@color/teal600</item>
-        <item>@color/teal700</item>
-        <item>@color/teal900</item>
+    <color name="purple100">#e1bee7</color>
+    <color name="purple200">#ce93d8</color>
+    <color name="purple300">#ba68c8</color>
+    <color name="purple400">#ab47bc</color>
+    <color name="purple500">#9c27b0</color>
+    <color name="purple600">#8e24aa</color>
+    <color name="purple700">#7b1fa2</color>
+    <color name="purple800">#6a1b9a</color>
+    <color name="purple900">#4a148c</color>
+
+    <color name="green100">#c8e6c9</color>
+    <color name="green200">#a5d6a7</color>
+    <color name="green300">#81c784</color>
+    <color name="green400">#66bb6a</color>
+    <color name="green500">#4caf50</color>
+    <color name="green600">#43a047</color>
+    <color name="green700">#388e3c</color>
+    <color name="green800">#2e7d32</color>
+    <color name="green900">#1b5e20</color>
+
+    <color name="amber100">#ffecb3</color>
+    <color name="amber200">#ffe082</color>
+    <color name="amber300">#ffd54f</color>
+    <color name="amber400">#ffca28</color>
+    <color name="amber500">#ffc107</color>
+    <color name="amber600">#ffb300</color>
+    <color name="amber700">#ffa000</color>
+    <color name="amber800">#ff8f00</color>
+    <color name="amber900">#ff6f00</color>
+
+
+    <array name="vegetal_colors">
+        <item>@color/green100</item>
+        <item>@color/green300</item>
+        <item>@color/green400</item>
+        <item>@color/green500</item>
+        <item>@color/green600</item>
+        <item>@color/green700</item>
+        <item>@color/green800</item>
+        <item>@color/green900</item>
     </array>
 
+    <array name="water_colors">
+        <item>@color/blue100</item>
+        <item>@color/blue200</item>
+        <item>@color/blue300</item>
+        <item>@color/blue400</item>
+        <item>@color/blue500</item>
+        <item>@color/blue600</item>
+        <item>@color/blue700</item>
+        <item>@color/blue800</item>
+    </array>
 
+    <array name="fire_colors">
+        <item>@color/amber100</item>
+        <item>@color/amber200</item>
+        <item>@color/amber300</item>
+        <item>@color/amber400</item>
+        <item>@color/amber500</item>
+        <item>@color/amber600</item>
+        <item>@color/amber700</item>
+        <item>@color/amber800</item>
+    </array>
+
+    <array name="live_colors">
+        <item>@color/purple100</item>
+        <item>@color/purple200</item>
+        <item>@color/purple300</item>
+        <item>@color/purple400</item>
+        <item>@color/purple500</item>
+        <item>@color/purple600</item>
+        <item>@color/purple700</item>
+        <item>@color/purple800</item>
+    </array>
 </resources>

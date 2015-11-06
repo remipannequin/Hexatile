@@ -3,10 +3,13 @@ package gabygaby.hexatile.game;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
+import gabygaby.hexatile.GameActivity;
 
 /**
  * This class represent a board, i.e. a set of hexagonal tiles, with a toroid topology
@@ -23,13 +26,13 @@ public class Board implements Parcelable {
     private final int height;
     private int score;
     private boolean dirty = false;
-    private Stat stat;
-    private List<BoardEventListener> listeners;
+    private final Stat stat;
+    private final List<BoardEventListener> listeners;
 
     public Board(int width, int height) {
         this.width = width;
         this.height = height;
-        stat = new Stat();
+        stat = new Stat(width*height);
         score = 0;
         tiles = new Tile[height * width];
         listeners = new ArrayList<>();
@@ -114,10 +117,11 @@ public class Board implements Parcelable {
         Set<Tile> group = last.findGroup();
         group.remove(last);
         if (group.size() >= THRESHOLD) {
+            int group_value = 0;
             for (Tile t : group) {
-                t.consume();
+                group_value += t.consume();
             }
-            last.promote();
+            last.promote(group_value);
             int reward = Score.collapse(last, group);
             stat.recordScore(last.getLevel(), reward);
             score += reward;
@@ -137,15 +141,13 @@ public class Board implements Parcelable {
     /**
      * compute if the game is over
      *
-     * @return true if the board is completelly filled
+     * @return true if the board is completely filled
      */
     public boolean isGameOver() {
         for (Tile t : tiles) {
-
-            if (t.isFree()) {
+            if (t.isFree() || t.isMutable()) {
                 return false;
             }
-
         }
         return true;
     }
@@ -195,7 +197,7 @@ public class Board implements Parcelable {
     }
 
     /**
-     * Fill selected Tile, if it is empty, and enerate all cascading board events
+     * Fill selected Tile, if it is empty, and generate all cascading board events
      *
      * @param selected selected Tile
      * @param value the level to give to the new tile
@@ -204,33 +206,89 @@ public class Board implements Parcelable {
         if (selected.isFree()) {
             selected.fill(value);
             dirty = true;
-            stat.recordPutTile(selected.getLevel());//level is always 1 here
+            stat.recordPutTile(selected.getLevel());
             boolean collapsing = (selected.findGroup().size() > Board.THRESHOLD);
             for (BoardEventListener l : listeners) {
                 l.onTileAdded(selected, collapsing, value);
             }
-            while (isDirty()) {
-                Set<Tile> group = compute(selected);
+            clean(selected, collapsing);
+        }
+    }
 
-                if (group.size() >= Board.THRESHOLD) {
-                    for (BoardEventListener l : listeners) {
-                        l.onGroupCollapsed(group, selected);
-                    }
-                } else {
-                    if (collapsing) {
-                        for (BoardEventListener l : listeners) {
-                            l.onCascadeFinished();
-                        }
-                    }
-                }
+    /**
+     * Mutate the selected tile (if possible)
+     * @param selected the tile to mutate
+     */
+    public void mutate(Tile selected) {
+        if (selected.isMutable()) {
+            selected.mutate();
+            int level = selected.getLevel();
+            dirty = true;
+            int reward = Score.mutate(selected);
+            score += reward;
+            stat.recordMutateTile(selected.getKind());//TODO record mutations specifically
+            boolean collapsing = willCollapse(selected);
+            for (BoardEventListener l : listeners) {
+                l.onTileMutated(selected, collapsing, level);
             }
-            if (isGameOver()) {
+
+            clean(selected, collapsing);
+        } else {
+            Log.w(GameActivity.TAG, "selected tile was not mutable");
+        }
+    }
+
+
+
+    /**
+     * Return true if a collapse event will happen
+     * @param selected the tile to test for collapse
+     * @return true if the group will collapse
+     */
+    private boolean willCollapse(Tile selected) {
+        return (selected.findGroup().size() > Board.THRESHOLD);
+    }
+
+    /**
+     * Collapse groups if needed until no collapse happen
+     * @param selected the tile to check for collapsing
+     * @param willCollapse true if a collapsing will happen
+     */
+    private void clean(Tile selected, boolean willCollapse) {
+        while (isDirty()) {
+            Set<Tile> group = compute(selected);
+
+            if (group.size() >= Board.THRESHOLD) {
                 for (BoardEventListener l : listeners) {
-                    l.onGameOver();
+                    l.onGroupCollapsed(group, selected);
+                }
+            } else {
+                if (willCollapse) {
+                    for (BoardEventListener l : listeners) {
+                        l.onCascadeFinished();
+                    }
                 }
             }
         }
+        stat.recordOccupation(getOccupation());
+        if (isGameOver()) {
+            for (BoardEventListener l : listeners) {
+                l.onGameOver();
+            }
+        }
+
     }
+
+    private int getOccupation() {
+        int result = 0;
+        for (Tile t: tiles) {
+            if (!t.isFree()) {
+                result++;
+            }
+        }
+        return result;
+    }
+
 
     public void setScore(int score) {
         this.score = score;
@@ -238,7 +296,7 @@ public class Board implements Parcelable {
 
 
     /**
-     * Interface to be implemented by classes that wan't to be notified of game events
+     * Interface to be implemented by classes that want to be notified of game events
      */
     public interface BoardEventListener {
         /**
@@ -267,5 +325,7 @@ public class Board implements Parcelable {
          * Called when the game is over
          */
         void onGameOver();
+
+        void onTileMutated(Tile selected, boolean collapsing, int origLevel);
     }
 }

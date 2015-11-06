@@ -7,15 +7,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import gabygaby.hexatile.MainActivity;
+import gabygaby.hexatile.GameActivity;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
 
 /**
- * Persist game information (highscore, bestTile, current game in a private file.
+ * Persist game information (high score, bestTile, current game in a private file.
  *
  * Structure of the file
  * int (4 bytes) high score
@@ -32,27 +33,30 @@ import gabygaby.hexatile.game.Tile;
  */
 public class GamePersist implements Board.BoardEventListener {
     private Context context;
-    String FILENAME_HIGHSCORE = "highscore"; //NON-NLS
-    String FILENAME_CURRENT = "current"; //NON-NLS
+    final String FILENAME_HIGHSCORE = "highscore"; //NON-NLS
+    final String FILENAME_CURRENT = "current"; //NON-NLS
 
     private int bestTile;
     private int highScore;
     private Board board;
 
 
-    private static GamePersist ourInstance = new GamePersist();
+    private static final GamePersist ourInstance = new GamePersist();
 
     public static GamePersist getInstance() {
         return ourInstance;
     }
 
     private GamePersist() {
+        //sane values
+        highScore = 0;
+        bestTile = 1;
     }
 
     public void init(Context ctx) {
         context = ctx;
 
-        FileInputStream fis = null;
+        FileInputStream fis;
         try {
             fis = context.openFileInput(FILENAME_HIGHSCORE);
 
@@ -79,26 +83,31 @@ public class GamePersist implements Board.BoardEventListener {
             Tile[] tiles = board.getTiles();
             for (Tile t: tiles) {
                 short level = buffer.getShort();
-                //for future use
                 short kind = buffer.getShort();
+                if (kind == 0 && level != 0) {kind = 1;}
                 int value = buffer.getInt();
                 t.setLevel(level);
+                t.setKind(kind);
+                t.setValue(value);
             }
             board.addListener(this);
             fis.close();
 
         } catch (FileNotFoundException e) {
             //Can happen on the first exec
-            highScore = 0;
-            bestTile = 1;
+            board = null;
+        } catch ( BufferUnderflowException e) {
+            // file may be corrupted (too short)
+            Log.w(GameActivity.TAG, "error while loading save file");
+            context.deleteFile(FILENAME_CURRENT);
             board = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isInitialized() {
-        return context != null;
+    public boolean needsInitialization() {
+        return context == null;
     }
 
     private void write_score() {
@@ -126,18 +135,21 @@ public class GamePersist implements Board.BoardEventListener {
             try {
                 fos = context.openFileOutput(FILENAME_CURRENT, Context.MODE_PRIVATE);
 
-                ByteBuffer buffer = ByteBuffer.allocate((Integer.SIZE * 3 +
-                        (Short.SIZE * 2 + Integer.SIZE) * w * h)
-                        / Byte.SIZE);
+                ByteBuffer buffer = ByteBuffer.allocate(
+                        (Integer.SIZE * 3 + //score, width, height
+                                (Short.SIZE * 2 + Integer.SIZE) //level, kind, value...
+                                        * w * h) // ...for each tile
+                                / Byte.SIZE);
                 buffer.putInt(s);
                 buffer.putInt(w);
                 buffer.putInt(h);
                 for (Tile t : tiles) {
                     short level = (short) t.getLevel();
+                    short kind = (short) t.getKind();
+                    int value = t.getValue();
                     buffer.putShort(level);
-                    //useful for future format
-                    buffer.putShort((short) 0);
-                    buffer.putInt(0);
+                    buffer.putShort(kind);
+                    buffer.putInt(value);
                 }
                 fos.write(buffer.array());
                 fos.close();
@@ -174,9 +186,10 @@ public class GamePersist implements Board.BoardEventListener {
         int score = board.getScore();
         if (highScore < score) {
             highScore = score;
+            write_score();
         }
         board = null;
-        write_score();
+        write_board();
     }
 
     @Override
@@ -204,6 +217,10 @@ public class GamePersist implements Board.BoardEventListener {
     @Override
     public void onGameOver() {
 
+    }
+
+    @Override
+    public void onTileMutated(Tile selected, boolean collapsing, int origLevel) {
     }
 
     public Board getBoard() {

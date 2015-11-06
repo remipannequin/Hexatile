@@ -1,11 +1,11 @@
 package gabygaby.hexatile.game;
 
 
-import android.util.Log;
 
 import java.security.InvalidParameterException;
 
-import gabygaby.hexatile.GameActivity;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to store statistics about a game
@@ -14,14 +14,22 @@ import gabygaby.hexatile.GameActivity;
  */
 public class Stat {
 
-    private int[] scoreByLevel;
-    private int[] scoreEventCount;
-    private int[] tilesAdded;
+    private final int boardSize;
+    private final int[] scoreByLevel;
+    private final int[] scoreEventCount;
+    private final int[] tilesAdded;
+    private final List<Float> boardOccupation;
+    private final int[] tileMutated;
 
-    public Stat() {
+    
+        
+    public Stat(int boardSize) {
+        this.boardSize = boardSize;
         this.scoreEventCount = new int[Tile.MAX_TILE_LEVEL+1];
         this.scoreByLevel = new int[Tile.MAX_TILE_LEVEL+1];
         this.tilesAdded = new int[Tile.MAX_TILE_LEVEL+1];
+        this.tileMutated = new int[3];
+        this.boardOccupation = new ArrayList<>();
     }
 
     public void recordScore(int level, int reward) {
@@ -36,4 +44,17 @@ public class Stat {
         }
         tilesAdded[level]++;
     }
+
+    /**
+     * Record that a tile was mutated
+     * @param kind at least 2, since only tile above kind 1 can mutate
+     */
+    public void recordMutateTile(int kind) {
+        tileMutated[kind-2]++;
+    }
+
+    public void recordOccupation(int numberOfTiles) {
+        boardOccupation.add((float)numberOfTiles / (float)boardSize);
+    }
+
 }

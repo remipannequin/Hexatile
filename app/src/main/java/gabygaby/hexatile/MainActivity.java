@@ -2,9 +2,9 @@ package gabygaby.hexatile;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
@@ -21,17 +21,16 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
 
     public static final String TAG = "hexatile.MainActivity"; //NON-NLS
 
-    private TextView highscore;
+    private TextView highScore;
     private Button newGameButton;
     private TileView bestTile;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-        highscore = (TextView) findViewById(R.id.highScoreTextView);
+        highScore = (TextView) findViewById(R.id.highScoreTextView);
         newGameButton = (Button) findViewById(R.id.gameButton);
         bestTile = (TileView) findViewById(R.id.bestTileView);
         Tile t = new Tile(0, 1);
@@ -48,23 +47,48 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
         bestTileRotAnim.setInterpolator(new AccelerateDecelerateInterpolator());
         bestTileRotAnim.setRepeatMode(Animation.REVERSE);
         bestTileRotAnim.setRepeatCount(Animation.INFINITE);
-        bestTileRotAnim.start();
-
+        if (! BuildConfig.DEBUG) {
+             bestTileRotAnim.start();
+        }
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
     }
 
 
     @Override
+    public boolean onTouchEvent(MotionEvent event) {
+
+        if (event.getAction() == MotionEvent.ACTION_UP && BuildConfig.DEBUG) {
+            float y = event.getY();
+            if (y >= bestTile.getTop() && y <= bestTile.getBottom()) {
+
+                Tile t = bestTile.getTile();
+                int l = t.getLevel();
+                int k = t.getKind();
+                if (l >= (Tile.MAX_TILE_LEVEL-1)) {
+                    k = (k % Tile.MAX_TILE_KIND) + 1;
+                    t.setLevel(k);
+                    t.setKind(k);
+                } else {
+                    t.setLevel(l + 1);
+                }
+                bestTile.syncDrawnLevel();
+                bestTile.invalidate();
+            }
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
     protected void onStart() {
         super.onStart();
-        //get level from saved highscores
+        //get level from saved high scores
         GamePersist gp = GamePersist.getInstance();
-        if (!gp.isInitialized()) {
+        if (gp.needsInitialization()) {
             gp.init(getApplicationContext());
         }
 
-        highscore.setText(String.format("%d", gp.highScore())); //NON-NLS
+        highScore.setText(String.format("%d", gp.highScore())); //NON-NLS
         bestTile.getTile().setLevel(gp.bestTileEver());
         bestTile.syncDrawnLevel();
         if (gp.hasUnfinishedGame()) {
@@ -78,7 +102,7 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     /**
      * Called when clicking the singIn signOut buttons
      *
-     * @param view
+     * @param view the view clicked
      */
     public void onClick(View view) {
         if (isSignedIn()) {
@@ -91,9 +115,8 @@ public class MainActivity extends BaseGameActivity implements View.OnClickListen
     /**
      * show game activity
      *
-     * @param v
      */
-    public void onGameButtonClicked(View v) {
+    public void onGameButtonClicked(View view) {
         Intent intent = new Intent(this, GameActivity.class);
         startActivity(intent);
     }

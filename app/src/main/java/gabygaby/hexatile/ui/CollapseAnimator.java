@@ -8,7 +8,7 @@ import android.view.animation.AccelerateInterpolator;
 
 /**
  * This class facilitate the animation of a collapse event. This event is described as a cascade of
- * subevents when a group of tiles collapse into a promoted tile.
+ * sub-events when a group of tiles collapse into a promoted tile.
  */
 public class CollapseAnimator {
 
@@ -24,7 +24,7 @@ public class CollapseAnimator {
      */
     private boolean firstGroup;
     /**
-     * True if two group should be chained toghether
+     * True if two group should be chained together
      */
     private boolean groupBegin;
 
@@ -159,15 +159,15 @@ public class CollapseAnimator {
         });
 
 
-        ObjectAnimator fadein = ObjectAnimator.ofFloat(view, "alpha", 0, 1); //NON-NLS
-        fadein.setDuration(PROMOTION_DURATION);
-        fadein.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        ObjectAnimator fadeIn = ObjectAnimator.ofFloat(view, "alpha", 0, 1); //NON-NLS
+        fadeIn.setDuration(PROMOTION_DURATION);
+        fadeIn.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 view.invalidate();
             }
         });
-        fadein.addListener(new Animator.AnimatorListener() {
+        fadeIn.addListener(new Animator.AnimatorListener() {
             @Override
             public void onAnimationStart(Animator animation) {
                 view.invalidate();
@@ -191,7 +191,7 @@ public class CollapseAnimator {
 
 
         set.play(lastInGroup).before(fadeout);
-        set.play(fadeout).before(fadein);
+        set.play(fadeout).before(fadeIn);
         lastInGroup = fadeout;
     }
 

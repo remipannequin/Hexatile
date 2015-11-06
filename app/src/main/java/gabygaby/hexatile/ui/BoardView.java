@@ -14,23 +14,18 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
-import android.view.animation.Animation;
 import android.view.animation.CycleInterpolator;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import gabygaby.hexatile.GameActivity;
 import gabygaby.hexatile.R;
 import gabygaby.hexatile.game.Board;
 import gabygaby.hexatile.game.Tile;
@@ -39,7 +34,7 @@ import gabygaby.hexatile.game.TileGenerator;
 /**
  * The view shows a Board instance, and enable the user to play with it i.e. select tiles
  */
-public class BoardView extends ViewGroup implements Board.BoardEventListener{
+public class BoardView extends ViewGroup implements Board.BoardEventListener {
 
     public static final float COS = 0.866025f;
     public static final float SIN = 0.5f;
@@ -50,9 +45,8 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     private TileGenerator generator;
 
     private GestureDetector gestureDetector;
-    private List<Path> mesh;
-    private Map<PointF, Tile> centers;
-    private int additionalPadding;
+    private Path mesh;
+    private Map<Tile, PointF> centers;
     private Paint meshPaint;
 
     private int tileHeight, tileWidth = 0;
@@ -60,6 +54,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     private boolean moving = false;
     private boolean blockMoving;
+    private float strokeWidth;
+    private Matrix padding_translate;
+    private Path drawing;
 
     public BoardView(Context context) {
         super(context);
@@ -94,10 +91,10 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
         collapseAnimator = new CollapseAnimator();
         centers = new HashMap<>();
-        mesh = new ArrayList<>();
+        mesh = new Path();
 
         Resources r = getResources();
-        float strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, r.getDisplayMetrics());
+        strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3f, r.getDisplayMetrics());
         meshPaint = new Paint();
         meshPaint.setStrokeWidth(strokeWidth);
         meshPaint.setStyle(Paint.Style.STROKE);
@@ -106,7 +103,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         gestureDetector = new GestureDetector(BoardView.this.getContext(), new GestureListener());
         gestureDetector.setIsLongpressEnabled(true);
 
-        // In edit mode it'animatorSet nice to have some demo data, so add that here.
+        padding_translate = new Matrix();
+        drawing = new Path();
+        // In edit mode it's nice to have some demo data, so add that here.
         if (this.isInEditMode()) {
             setBoard(new Board(5, 6));
         }
@@ -129,23 +128,22 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         return result;
     }
 
-
+    /**
+     * Select the tile at coordinate (x, y)
+     *
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @param tap true if tapping, false if hovering
+     */
     private void selectTile(float x, float y, boolean tap) {
-        Tile selected = null;
-        for (Map.Entry<PointF, Tile> center : centers.entrySet()) {
-            double d = Math.pow(x - center.getKey().x, 2) + Math.pow(y - center.getKey().y, 2);
-            if (d < Math.pow(tileWidth / 2, 2)) {
-                selected = center.getValue();
-                break;
-            }
-        }
+        Tile selected = findTileAt(x, y);
         if (selected != null) {
             if (selected.isFree()) {
                 int value = generator.consume();
                 board.fill(selected, value);
                 // if the available tile in the generator is not the same than the last tile added,
                 // block selection on move
-                if (moving  && generator.peekFutures().get(0) != value) {
+                if (moving && generator.peekFutures().get(0) != value) {
                     blockMoving = true;
                 }
             } else if (tap) {
@@ -169,6 +167,43 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
         }
     }
 
+    /**
+     * Return the tile at the coordinate, or null if there is no tile there.
+     *
+     * @param x x-coordinate
+     * @param y y-coordinate
+     * @return the tile if found, or null
+     */
+    private Tile findTileAt(float x, float y) {
+        Tile selected = null;
+        for (Map.Entry<Tile, PointF> center : centers.entrySet()) {
+            double d = Math.pow(x - center.getValue().x, 2) + Math.pow(y - center.getValue().y, 2);
+            if (d < Math.pow(tileWidth / 2, 2)) {
+                selected = center.getKey();
+                break;
+            }
+        }
+        return selected;
+    }
+
+    /**
+     * Activate the tile at coordinate
+     *
+     * @param x x-coordinate
+     * @param y y-coordinate
+     */
+    private void activateTile(float x, float y) {
+        Tile selected = findTileAt(x, y);
+        if (selected != null) {
+            //mutate the tile if possible
+            if (selected.isMutable()) {
+                board.mutate(selected);
+                //TileView view = (TileView) getChildAt(selected.getIndex());
+                //view.syncDrawnLevel();
+                //view.invalidate();
+            }
+        }
+    }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -183,9 +218,9 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 float tx = (j + offset / 2f) * tileWidth;
                 float ty = (i * 0.75f) * tileHeight;
 
-                v.layout(Math.round(tx + paddingLeft+additionalPadding), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
-                centers.put(new PointF(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2), v.getTile());
-
+                v.layout(Math.round(tx + paddingLeft), Math.round(ty + paddingTop), Math.round(tx + tileWidth + paddingLeft), Math.round(ty + tileHeight + paddingTop));
+                PointF p = centers.get(v.getTile());
+                p.set(tx + paddingLeft + tileWidth / 2, ty + paddingTop + tileHeight / 2);
             }
         }
     }
@@ -194,68 +229,34 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        //case where the width is the limiting dimention
-        tileWidth = (int)Math.floor(width / (board.getWidth()+0.5f))-1;
-        additionalPadding = Math.round(((width) - (int)(tileWidth * (board.getWidth()+0.5)))*0.5f);
+        int padding = (int)Math.ceil(strokeWidth);
+        int width = MeasureSpec.getSize(widthMeasureSpec) - 2 * padding ;
+        //case where the width is the limiting dimension
+        tileWidth = (int) Math.floor(width / (board.getWidth() + 0.5f));
+        int additionalPadding = Math.round(((width) - (int) (tileWidth * (board.getWidth() + 0.5))) * 0.5f);
         tileHeight = Math.round(tileWidth / COS);
-        setMeasuredDimension(width, (int)Math.round((board.getHeight() - (board.getHeight()-1)*0.25)*tileHeight));
+        setMeasuredDimension(width, (int) Math.round((board.getHeight() - (board.getHeight() - 1) * 0.25) * tileHeight) + 2 * padding);
 
+        setPadding(padding + additionalPadding, padding, padding + additionalPadding, padding);
+        padding_translate.reset();
+        padding_translate.setTranslate(getPaddingLeft(), getPaddingTop());
         int child_height = MeasureSpec.makeMeasureSpec(tileHeight, MeasureSpec.EXACTLY);
         int child_width = MeasureSpec.makeMeasureSpec(tileWidth, MeasureSpec.EXACTLY);
-
 
 
         for (int i = 0; i < getChildCount(); i++) {
             View v = getChildAt(i);
             v.measure(child_width, child_height);
         }
-        Matrix tr = new Matrix();
-        tr.setTranslate(getPaddingLeft()+additionalPadding/2, getPaddingTop());
-        mesh.clear();
-        for (float j = 0; j < board.getHeight() / 1.5; j += 1.5) {
-            Path p1 = new Path();
-            p1.moveTo(0.5f * tileWidth, (j + 1f) * tileHeight);
-            p1.lineTo(0, (0.75f + j) * tileHeight);
-            for (int i = 0; i < board.getWidth(); i++) {
-                p1.moveTo(i * tileWidth, (0.75f + j) * tileHeight);
-                p1.lineTo(i * tileWidth, (0.25f + j) * tileHeight);
-                p1.lineTo(tileWidth * (i + 0.5f), j * tileHeight);
-                p1.lineTo(tileWidth * (i + 1), (0.25f + j) * tileHeight);
-                p1.lineTo(tileWidth * (i + 1), (0.75f + j) * tileHeight);
-            }
-            p1.transform(tr);
-            mesh.add(p1);
-
-            Path p2 = new Path();
-            for (int i = 0; i < board.getWidth(); i++) {
-                p2.moveTo((i + 0.5f) * tileWidth, (1.5f + j) * tileHeight);
-                p2.lineTo((i + 0.5f) * tileWidth, (1f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1f), (0.75f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1.5f), (1f + j) * tileHeight);
-                p2.lineTo(tileWidth * (i + 1.5f), (1.5f + j) * tileHeight);
-            }
-            p2.lineTo(tileWidth * (board.getWidth()), (1.75f + j) * tileHeight);
-            p2.transform(tr);
-            mesh.add(p2);
-        }
-
-        Path p3 = new Path();
-        for (int i = 0; i < board.getWidth(); i++) {
-            p3.moveTo((i + 0.5f) * tileWidth, (board.getHeight() * 0.75f) * tileHeight);
-            p3.lineTo((i + 1f) * tileWidth, (0.25f + board.getHeight() * 0.75f) * tileHeight);
-            p3.lineTo(tileWidth * (i + 1.5f), (board.getHeight() * 0.75f) * tileHeight);
-        }
-        p3.transform(tr);
-        mesh.add(p3);
+        mesh = TileDecorator.getInstance().getMesh(tileHeight, tileWidth, board.getHeight(), board.getWidth());
     }
 
 
     @Override
     protected void onDraw(Canvas canvas) {
-        for (Path p : mesh) {
-            canvas.drawPath(p, meshPaint);
-        }
+        drawing.reset();
+        mesh.transform(padding_translate, drawing);
+        canvas.drawPath(drawing, meshPaint);
     }
 
     public void setBoard(Board board) {
@@ -267,6 +268,7 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
             child.setDecoColor(decoColor);
             child.setTile(t);
             this.addView(child, i++);
+            centers.put(t, new PointF());
         }
         board.addListener(this);
     }
@@ -346,8 +348,58 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
 
     }
 
+    @Override
+    public void onTileMutated(Tile mutatedTile, boolean collapsing, final int origLevel) {
+        AnimatorSet s = new AnimatorSet();
+        final TileView view = (TileView) getChildAt(mutatedTile.getIndex());
+        ObjectAnimator shrinkInAnimX = ObjectAnimator.ofFloat(view, "scaleX", 1, 0.1f); //NON-NLS
+        ObjectAnimator shrinkInAnimY = ObjectAnimator.ofFloat(view, "scaleY", 1, 0.1f); //NON-NLS
+        ObjectAnimator shrinkOutAnimX = ObjectAnimator.ofFloat(view, "scaleX", 0.1f, 1); //NON-NLS
+        ObjectAnimator shrinkOutAnimY = ObjectAnimator.ofFloat(view, "scaleY", 0.1f, 1); //NON-NLS
+
+        shrinkOutAnimX.addListener(new Animator.AnimatorListener() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                view.syncDrawnLevel();
+                view.setDrawnLevel(origLevel);
+                view.invalidate();
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+
+            }
+
+            @Override
+            public void onAnimationCancel(Animator animation) {
+            }
+
+            @Override
+            public void onAnimationRepeat(Animator animation) {
+            }
+        });
+
+        shrinkInAnimX.setDuration(250);
+        shrinkInAnimX.setDuration(250);
+        shrinkInAnimX.setInterpolator(new AccelerateInterpolator());
+        shrinkInAnimY.setInterpolator(new AccelerateInterpolator());
+        shrinkOutAnimX.setDuration(250);
+        shrinkOutAnimX.setDuration(250);
+        shrinkOutAnimX.setInterpolator(new AccelerateInterpolator());
+        shrinkOutAnimY.setInterpolator(new AccelerateInterpolator());
+        s.play(shrinkInAnimX).with(shrinkInAnimY);
+        s.play(shrinkOutAnimX).with(shrinkOutAnimY);
+        s.play(shrinkOutAnimX).after(shrinkInAnimX);
+
+        if (collapsing) {
+            collapseAnimator.reset(s);
+        } else {
+            s.start();
+        }
+    }
+
     /**
-     * Invalidate all the child tiles. Usefull when setting the board
+     * Invalidate all the child tiles. Useful when setting the board
      */
     public void invalidateAll() {
         for (int i = 0; i < getChildCount(); i++) {
@@ -382,6 +434,11 @@ public class BoardView extends ViewGroup implements Board.BoardEventListener{
                 selectTile(e2.getX(), e2.getY(), false);
             }
             return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            activateTile(e.getX(), e.getY());
         }
     }
 }

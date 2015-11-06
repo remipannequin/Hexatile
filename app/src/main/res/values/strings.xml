@@ -1,11 +1,39 @@
 <resources>
     <string name="app_name">Hexatile</string>
-    <string name="achievement">Achievement unlocked</string>
     <string name="title_activity_game">Hexatile</string>
-    <string name="signin_other_error">error in sign in</string>
     <string name="button_resume_game">Resume Game</string>
     <string name="best_score">Best score</string>
     <string name="new_game">New Game</string>
     <string name="quit">Quit</string>
     <string name="game_over">Game Over</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="tile11">moss</string>
+    <string name="tile12">grass</string>
+    <string name="tile13">plant</string>
+    <string name="tile14">bush</string>
+    <string name="tile15">tree</string>
+    <string name="tile16">woods</string>
+    <string name="tile17">forest</string>
+    <string name="tile18">jungle</string>
+    <string name="tile22">cloud</string>
+    <string name="tile23">drop</string>
+    <string name="tile24">rain</string>
+    <string name="tile25">river</string>
+    <string name="tile26">lake</string>
+    <string name="tile27">sea</string>
+    <string name="tile28">ocean</string>
+    <string name="tile33">heat</string>
+    <string name="tile34">spark</string>
+    <string name="tile35">smoke</string>
+    <string name="tile36">flame</string>
+    <string name="tile37">fire</string>
+    <string name="tile38">blaze</string>
+    <string name="tile44">protein</string>
+    <string name="tile45">cell</string>
+    <string name="tile46">worm</string>
+    <string name="tile47">bug</string>
+    <string name="tile48">wolf</string>
+
+
+
 </resources>
